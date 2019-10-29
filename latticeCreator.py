@@ -38,7 +38,7 @@ def createGraph(dimensions, gates):
         i = nodeStack.pop()
 
         # i is in the middle of the grid
-        if (n+2) <= i <= ((m-2)*n) + (n-1):
+        if i % n != 0 and i % n != 1 and n < i < (((m-1)*n) + 1):
 
             detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
             detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
@@ -46,14 +46,14 @@ def createGraph(dimensions, gates):
             detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
             
         # i is on the top edge
-        elif 2 <= i <= n-1:
+        if 2 <= i <= n-1:
 
             detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
             detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)
             detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
             
         # i is on the bottom edge
-        elif (m-1)+2 <= i <= ((m-1)*n) + (n-1):
+        elif ((m-1)*n)+2 <= i <= ((m-1)*n) + (n-1):
 
             detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
             detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
@@ -86,7 +86,7 @@ def createGraph(dimensions, gates):
             detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
             
         # i is on the bottom-left corner
-        elif i == (m-1) + 1:
+        elif i == ((m-1)*n) + 1:
 
             detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
             detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)

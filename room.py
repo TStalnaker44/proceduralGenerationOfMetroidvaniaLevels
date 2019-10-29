@@ -21,10 +21,12 @@ class Room():
 
 class Connector():
 
-    def __init__(self, r1, r2):
+    def __init__(self):
         self._image = pygame.Surface((1000,1000))
         self._image.fill((0,0,0))
         self._image.set_colorkey((0,0,0))
+
+    def addLine(self, r1, r2):
         pygame.draw.line(self._image, (255,255,255), r1.getCenter(),
                          r2.getCenter(), 2)
 
