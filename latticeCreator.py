@@ -105,9 +105,44 @@ def createGraph():
             
     return g
 
-g = createGraph()
-while m*n not in g:
+def findExplorable(g, keys):
+    """Return a list of nodes that are reachable from start using various keys"""
+    reachableNodes = [1]
+    edges = [e for e in g.edges(data=True) if e[2]["object"] in keys]
+    for edge in edges:
+        if edge[0] in reachableNodes and edge[1] not in reachableNodes:
+            reachableNodes.append(edge[1])
+        elif edge[1] in reachableNodes and edge[0] not in reachableNodes:
+            reachableNodes.append(edge[0])
+    return reachableNodes
+
+def viableMap():
+    
     g = createGraph()
+
+    # Ensure than the final node is included in the grid
+    if m*n not in g:
+        return False
+
+    # Ensure that the explorable area grows with new key discoveries
+    for x in range(1, len(gates)):
+        if len(findExplorable(g, gates[:x])) == \
+           len(findExplorable(g, gates[:x+1])):
+            return False
+        
+    # Find all the red edges
+    primary_edges = ([e for e in g.edges(data=True) if e[2]['object']==gates[0]]
+                     )
+    # Determine if a red edge connects the first node to another
+    for e in primary_edges:
+        if e[0] == 1:
+            return g
+        
+    return False
+        
+g = viableMap()
+while not g:
+    g = viableMap()
 
 print(gates)
 
