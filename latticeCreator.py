@@ -3,25 +3,17 @@ import random, grapher
 import networkx as nx
 import matplotlib.pyplot as plt
 
-m = 5
-n = 4
+
 
 dropout = 0.4
-
-ordering = {"red":["green","blue","orange"],
-                "blue":"yellow","yellow":["brown","tan"],"brown":["pink", "purple"]}
-gates = grapher.getGateOrder(ordering)
-
-# Create keys for each gate
-keys = {gate:0 for gate in gates}
 
 def r():
     return random.random() > dropout
 
-def detConnection(g, i, node, nodes, nodeStack, completedNodes):
+def detConnection(g, i, node, nodes, nodeStack, completedNodes, gates, endNode):
     if not node in completedNodes:
         gateTech = gates[random.randint(0,len(gates)-1)]
-        if i == m*n or node == m*n:
+        if i == endNode or node == endNode:
             gateTech = gates[-1]
         if r():
             g.add_edge(i, node, object=gateTech)
@@ -29,7 +21,9 @@ def detConnection(g, i, node, nodes, nodeStack, completedNodes):
                 nodeStack.append(node)
                 nodes.append(node)
 
-def createGraph():
+def createGraph(dimensions, gates):
+
+    m,n = dimensions
     
     g = nx.Graph()
 
@@ -46,62 +40,62 @@ def createGraph():
         # i is in the middle of the grid
         if (n+2) <= i <= ((m-2)*n) + (n-1):
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
             
         # i is on the top edge
         elif 2 <= i <= n-1:
 
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
             
         # i is on the bottom edge
         elif (m-1)+2 <= i <= ((m-1)*n) + (n-1):
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)
             
         # i is on the left edge
         elif i % n == 1 and (i != 1 and i != (((m-1)*n)+1)):
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
             
         # i is on the right edge
         elif i % n == 0 and (i != n and i != m*n):
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
             
         # i is on the top-left corner
         elif i == 1:
 
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
             
         # i is on the top-right corner
         elif i == n:
 
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
             
         # i is on the bottom-left corner
         elif i == (m-1) + 1:
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)
             
         # i is on the bottom-right corner
         elif i == m*n:
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes)
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
             
     return g
 
@@ -116,12 +110,12 @@ def findExplorable(g, keys):
             reachableNodes.append(edge[0])
     return reachableNodes
 
-def viableMap():
+def viableMap(dimensions, gates):
     
-    g = createGraph()
+    g = createGraph(dimensions, gates)
 
     # Ensure than the final node is included in the grid
-    if m*n not in g:
+    if dimensions[0]*dimensions[1] not in g:
         return False
 
     # Ensure that the explorable area grows with new key discoveries
@@ -139,18 +133,59 @@ def viableMap():
             return g
         
     return False
-        
-g = viableMap()
-while not g:
-    g = viableMap()
 
-print(gates)
+def generateViableMap(dimensions, gates, keys):
+    # Create a viable map
+    g = viableMap(dimensions, gates)
+    while not g:
+        g = viableMap(dimensions, gates)
+    placeKeys(g, gates, keys)
+    return g
 
-#Display the graph
-pos = nx.spring_layout(g)
-#nx.draw_planar(g, with_labels=True, font_weight='bold')
-nx.draw(g, pos, with_labels=True, font_weight='bold')
-edge_labels = nx.get_edge_attributes(g,'object')
-nx.draw_networkx_edge_labels(g, pos, edge_labels = edge_labels)
-plt.show()
+def placeKeys(g, gates, keys):
+    # Find random key locations within explorable zones
+    for x in range(0, len(gates)-1):
+        previouslyExplorable = set(findExplorable(g, gates[:x]))
+        nowExplorable = set(findExplorable(g, gates[:x+1]))
+        newAreas = list(nowExplorable - previouslyExplorable)
+        keyLocation = random.choice(newAreas)
+        keys[gates[x+1]] = keyLocation
+
+def main():
+
+    m = 6
+    n = 4
+    
+    ordering = {"red":["green","blue","orange"],
+                "blue":"yellow","yellow":["brown","tan"],"brown":["pink", "purple"]}
+    gates = grapher.getGateOrder(ordering)
+
+    # Create keys for each gate
+    keys = {gate:1 for gate in gates}
+
+    g = generateViableMap((m,n), gates, keys)
+
+    # Create a color mapping to visualize key locations
+    color_map = []
+    for node in g:
+        for gate in gates:
+            if keys[gate] == node:
+                color_map.append(gate)
+                break
+        else:
+            color_map.append("grey")
+
+    print(gates)
+
+    #Display the graph
+    pos = nx.spring_layout(g)
+    #nx.draw_planar(g, with_labels=True, font_weight='bold')
+    nx.draw(g, pos, node_color=color_map, with_labels=True, font_weight='bold')
+    edge_labels = nx.get_edge_attributes(g,'object')
+    nx.draw_networkx_edge_labels(g, pos, edge_labels = edge_labels)
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
         
