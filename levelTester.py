@@ -101,6 +101,16 @@ def main():
                connections[edge[0]] = edge[2]["object"]
          player.handleEvent(event, connections)
 
+
+      currentSquare = player.getCurrentSquare()+1
+      if currentSquare in keys.values():
+         for key in keys.keys():
+            if key not in player.getKeys() and \
+               keys[key] == currentSquare:
+               player.giveKey(key)
+               break
+      print(player.getKeys())
+
    #Close the pygame window and quit pygame
    pygame.quit()
 

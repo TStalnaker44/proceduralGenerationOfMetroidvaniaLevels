@@ -23,6 +23,9 @@ class Player():
     def giveKey(self, key):
         self._keys.append(key)
 
+    def getKeys(self):
+        return self._keys
+
     def handleEvent(self, event, connections):
         connectedNodes = [conn-1 for conn in connections.keys()]
         if event.type == pygame.KEYDOWN:
