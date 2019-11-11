@@ -26,9 +26,9 @@ class Connector():
         self._image.fill((0,0,0))
         self._image.set_colorkey((0,0,0))
 
-    def addLine(self, r1, r2):
-        pygame.draw.line(self._image, (255,255,255), r1.getCenter(),
-                         r2.getCenter(), 2)
+    def addLine(self, r1, r2, color=(255,255,255), weight=2):
+        pygame.draw.line(self._image, color, r1.getCenter(),
+                         r2.getCenter(), weight)
 
     def draw(self, surface, offset):
         surface.blit(self._image, offset)

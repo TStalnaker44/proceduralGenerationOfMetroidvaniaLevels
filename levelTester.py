@@ -38,9 +38,11 @@ def main():
    keys = {gate:1 for gate in gates}
    g = latticeCreator.generateViableMap(dimensions, gates, keys)
 
+   # Add connections between rooms
    lines = Connector()
    for edge in g.edges(data=True):
-      lines.addLine(rooms[edge[0]-1], rooms[edge[1]-1])
+      lineColor = colors[edge[2]["object"]]
+      lines.addLine(rooms[edge[0]-1], rooms[edge[1]-1], lineColor, 3)
 
    # Create a copy of the list to allow mutations without error
    roomCopy = copy.copy(rooms)
