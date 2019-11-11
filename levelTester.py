@@ -3,8 +3,11 @@ from room import Room
 from room import Connector
 from player import Player
 
-SCREEN_SIZE = (1200,800)
-WORLD_SIZE  = (2400,500)
+
+m = 6
+n = 6
+
+SCREEN_SIZE = (n*100,m*100)
 
 def main():
    """
@@ -25,8 +28,7 @@ def main():
    colors = {"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
              "orange":(255,165,0),"white":(255,255,255)}
 
-   m = 6
-   n = 6
+   won = False
 
    # Create a graph model
    dimensions = (m,n)
@@ -109,7 +111,12 @@ def main():
                keys[key] == currentSquare:
                player.giveKey(key)
                break
-      print(player.getKeys())
+
+      if currentSquare == m*n:
+         won = True
+
+      if won:
+         print("You Won!")
 
    #Close the pygame window and quit pygame
    pygame.quit()
