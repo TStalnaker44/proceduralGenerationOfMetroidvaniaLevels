@@ -82,6 +82,10 @@ def main():
       lines.draw(screen, (25,25))
 
       player.draw(screen)
+
+      if won:
+         screen.blit(font.render("You Have Won", False, (0,0,0)),
+                     (35*n,44*m))
       
       pygame.display.flip()
 
@@ -114,9 +118,6 @@ def main():
 
       if currentSquare == m*n:
          won = True
-
-      if won:
-         print("You Won!")
 
    #Close the pygame window and quit pygame
    pygame.quit()
