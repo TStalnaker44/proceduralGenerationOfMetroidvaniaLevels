@@ -26,17 +26,28 @@ def main():
 
    m = 6
    n = 6
-   rooms = []
-   c = 0
-   for y in range(m):
-       for x in range(n):
-           rooms.append(Room(((100*x) + 25,(100*y) + 25), (c,0,0)))
-           c+=1
+
+   # Create a graph model
    dimensions = (m,n)
    ordering = {"red":"blue","blue":"orange","orange":"green"}
    gates = grapher.getGateOrder(ordering)
    keys = {gate:1 for gate in gates}
    g = latticeCreator.generateViableMap(dimensions, gates, keys)
+
+   # Create rooms based on the model
+   rooms, c = [], 0
+   for y in range(m):
+       for x in range(n):
+         key =  None
+         rooms.append(Room(((100*x) + 25,(100*y) + 25), (c,0,0)))
+         c+=1
+
+   # Color rooms with keys
+   for key in keys.keys():
+      for i, room in enumerate(rooms):
+         if keys[key] == i+1:
+            room.color(colors[key])
+            break
 
    # Add connections between rooms
    lines = Connector()

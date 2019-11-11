@@ -16,6 +16,9 @@ class Room():
         return (self._position[0] - (self._width//2) + 2,
                 self._position[1] - (self._height//2) + 2)
 
+    def color(self, color):
+        self._image.fill(color)
+
     def draw(self, surface):
         surface.blit(self._image, self._position)
 
