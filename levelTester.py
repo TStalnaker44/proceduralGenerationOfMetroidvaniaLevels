@@ -1,4 +1,4 @@
-import pygame, latticeCreator, grapher
+import pygame, latticeCreator, grapher, copy
 from room import Room
 from room import Connector
 
@@ -24,14 +24,14 @@ def main():
    colors = {"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
              "orange":(255,165,0)}
 
-   m = 5
-   n = 4
+   m = 6
+   n = 6
    rooms = []
    c = 0
    for y in range(m):
        for x in range(n):
            rooms.append(Room(((100*x) + 25,(100*y) + 25), (c,0,0)))
-           c+=10
+           c+=1
    dimensions = (m,n)
    ordering = {"red":"blue","blue":"orange","orange":"green"}
    gates = grapher.getGateOrder(ordering)
@@ -40,23 +40,15 @@ def main():
 
    lines = Connector()
    for edge in g.edges(data=True):
-      print(len(rooms))
-      print(edge)
       lines.addLine(rooms[edge[0]-1], rooms[edge[1]-1])
 
-   for x in range(len(rooms)):
+   # Create a copy of the list to allow mutations without error
+   roomCopy = copy.copy(rooms)
+   for x in range(len(roomCopy)):
        # Remove rooms that are not part of the graph
        if not x+1 in g:
-           rooms.remove(rooms[x])
+           rooms.remove(roomCopy[x])
            
-
-      
-##   for x in range(len(rooms)):
-##       for y in range(len(rooms)):
-##           if x != y:
-##               lines.addLine(rooms[x], rooms[y])
-   #room = Room((100,100), (255,0,0))
-
    RUNNING = True
 
    while RUNNING:

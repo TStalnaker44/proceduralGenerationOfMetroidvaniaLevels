@@ -153,8 +153,8 @@ def placeKeys(g, gates, keys):
 
 def main():
 
-    m = 6
-    n = 4
+    m = 5
+    n = 5
     
     ordering = {"red":["green","blue","orange"],
                 "blue":"yellow","yellow":["brown","tan"],"brown":["pink", "purple"]}
