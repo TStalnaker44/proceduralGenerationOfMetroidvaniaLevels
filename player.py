@@ -20,27 +20,34 @@ class Player():
     def getCurrentSquare(self):
         return (self._gridSize[0] * self._gridPos[1]) + self._gridPos[0]
 
+    def giveKey(self, key):
+        self._keys.append(key)
+
     def handleEvent(self, event, connections):
-        connectedNodes = [conn[0]-1 for conn in connections]
+        connectedNodes = [conn-1 for conn in connections.keys()]
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and \
                self._gridPos[1]-1 >= 0 and \
-               self.getCurrentSquare() - self._gridSize[1] in connectedNodes:
+               self.getCurrentSquare() - self._gridSize[1] in connectedNodes and \
+               connections[(self.getCurrentSquare() - self._gridSize[1])+1] in self._keys:
                 self._pos[1] -= self._step
                 self._gridPos[1] -= 1
             elif event.key == pygame.K_DOWN and \
                  self._gridPos[1]+1 < self._gridSize[1] and \
-                 self.getCurrentSquare() + self._gridSize[1] in connectedNodes:
+                 self.getCurrentSquare() + self._gridSize[1] in connectedNodes and \
+                 connections[(self.getCurrentSquare() + self._gridSize[1])+1] in self._keys:
                 self._pos[1] += self._step
                 self._gridPos[1] += 1
             elif event.key == pygame.K_LEFT and \
                  self._gridPos[0]-1 >= 0 and \
-                 self.getCurrentSquare() - 1 in connectedNodes:
+                 self.getCurrentSquare() - 1 in connectedNodes and \
+                 connections[self.getCurrentSquare()] in self._keys:
                 self._pos[0] -= self._step
                 self._gridPos[0] -= 1
             elif event.key == pygame.K_RIGHT and \
                  self._gridPos[0]+1 < self._gridSize[0] and \
-                 self.getCurrentSquare() + 1 in connectedNodes:
+                 self.getCurrentSquare() + 1 in connectedNodes and \
+                 connections[self.getCurrentSquare() + 2] in self._keys:
                 self._pos[0] += self._step
                 self._gridPos[0] += 1
 

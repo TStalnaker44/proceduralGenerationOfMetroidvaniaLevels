@@ -93,12 +93,12 @@ def main():
 
          # Determine which square are reachable from current grid
          # position and over which gating types
-         connections = []
+         connections = {}
          for edge in g.edges(data=True):
             if edge[0] == player.getCurrentSquare()+1:
-               connections.append((edge[1], edge[2]["object"]))
+               connections[edge[1]] = edge[2]["object"]
             elif edge[1] == player.getCurrentSquare()+1:
-               connections.append((edge[0], edge[2]["object"]))
+               connections[edge[0]] = edge[2]["object"]
          player.handleEvent(event, connections)
 
    #Close the pygame window and quit pygame
