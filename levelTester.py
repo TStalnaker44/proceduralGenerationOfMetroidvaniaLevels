@@ -1,6 +1,7 @@
 import pygame, latticeCreator, grapher, copy
 from room import Room
 from room import Connector
+from player import Player
 
 SCREEN_SIZE = (1200,800)
 WORLD_SIZE  = (2400,500)
@@ -22,14 +23,14 @@ def main():
    screen = pygame.display.set_mode(SCREEN_SIZE)
 
    colors = {"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
-             "orange":(255,165,0)}
+             "orange":(255,165,0),"white":(255,255,255)}
 
    m = 6
    n = 6
 
    # Create a graph model
    dimensions = (m,n)
-   ordering = {"red":"blue","blue":"orange","orange":"green"}
+   ordering = {"red":"blue","blue":["orange","white"],"orange":"green"}
    gates = grapher.getGateOrder(ordering)
    keys = {gate:1 for gate in gates}
    g = latticeCreator.generateViableMap(dimensions, gates, keys)
@@ -61,6 +62,10 @@ def main():
        # Remove rooms that are not part of the graph
        if not x+1 in g:
            rooms.remove(roomCopy[x])
+
+   # Create a player object
+   startPos = rooms[0].getCenter()
+   player = Player([startPos[0]+20,startPos[1]+20], 100)
            
    RUNNING = True
 
@@ -73,6 +78,8 @@ def main():
           room.draw(screen)
 
       lines.draw(screen, (25,25))
+
+      player.draw(screen)
       
       pygame.display.flip()
 
@@ -83,6 +90,8 @@ def main():
              (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             # change the value to False, to exit the main loop
             RUNNING = False
+
+         player.handleEvent(event)
 
    #Close the pygame window and quit pygame
    pygame.quit()
