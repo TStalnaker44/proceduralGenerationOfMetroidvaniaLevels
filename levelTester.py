@@ -65,7 +65,7 @@ def main():
 
    # Create a player object
    startPos = rooms[0].getCenter()
-   player = Player([startPos[0]+20,startPos[1]+20], 100)
+   player = Player([startPos[0]+20,startPos[1]+20], 100, (m,n))
            
    RUNNING = True
 
@@ -91,7 +91,15 @@ def main():
             # change the value to False, to exit the main loop
             RUNNING = False
 
-         player.handleEvent(event)
+         # Determine which square are reachable from current grid
+         # position and over which gating types
+         connections = []
+         for edge in g.edges(data=True):
+            if edge[0] == player.getCurrentSquare()+1:
+               connections.append((edge[1], edge[2]["object"]))
+            elif edge[1] == player.getCurrentSquare()+1:
+               connections.append((edge[0], edge[2]["object"]))
+         player.handleEvent(event, connections)
 
    #Close the pygame window and quit pygame
    pygame.quit()
