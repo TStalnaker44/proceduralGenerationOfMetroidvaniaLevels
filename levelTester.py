@@ -97,27 +97,29 @@ def main():
             # change the value to False, to exit the main loop
             RUNNING = False
 
-         # Determine which square are reachable from current grid
-         # position and over which gating types
-         connections = {}
-         for edge in g.edges(data=True):
-            if edge[0] == player.getCurrentSquare()+1:
-               connections[edge[1]] = edge[2]["object"]
-            elif edge[1] == player.getCurrentSquare()+1:
-               connections[edge[0]] = edge[2]["object"]
-         player.handleEvent(event, connections)
+         if not won:
+            # Determine which square are reachable from current grid
+            # position and over which gating types
+            connections = {}
+            for edge in g.edges(data=True):
+               if edge[0] == player.getCurrentSquare()+1:
+                  connections[edge[1]] = edge[2]["object"]
+               elif edge[1] == player.getCurrentSquare()+1:
+                  connections[edge[0]] = edge[2]["object"]
+            player.handleEvent(event, connections)
 
 
-      currentSquare = player.getCurrentSquare()+1
-      if currentSquare in keys.values():
-         for key in keys.keys():
-            if key not in player.getKeys() and \
-               keys[key] == currentSquare:
-               player.giveKey(key)
-               break
+      if not won:
+         currentSquare = player.getCurrentSquare()+1
+         if currentSquare in keys.values():
+            for key in keys.keys():
+               if key not in player.getKeys() and \
+                  keys[key] == currentSquare:
+                  player.giveKey(key)
+                  break
 
-      if currentSquare == m*n:
-         won = True
+         if currentSquare == m*n:
+            won = True
 
    #Close the pygame window and quit pygame
    pygame.quit()
