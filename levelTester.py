@@ -83,6 +83,10 @@ def main():
 
       player.draw(screen)
 
+      r = 10
+      for i, orb in enumerate(player.getKeys()):
+         pygame.draw.circle(screen, colors[orb], ((i+1) * int(2.5 * r) ,SCREEN_SIZE[1]-25), r)
+
       if won:
          screen.blit(font.render("You Have Won", False, (0,0,0)),
                      (35*n,44*m))
@@ -107,7 +111,6 @@ def main():
                elif edge[1] == player.getCurrentSquare()+1:
                   connections[edge[0]] = edge[2]["object"]
             player.handleEvent(event, connections)
-
 
       if not won:
          currentSquare = player.getCurrentSquare()+1
