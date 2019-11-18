@@ -1,11 +1,13 @@
-import pygame, latticeCreator, grapher, copy
+import pygame, latticeCreator, grapher, copy, random
 from room import Room
 from room import Connector
 from player import Player
 
 
-m = 6
-n = 6
+x = random.randint(5,8)
+
+m = x
+n = x
 
 SCREEN_SIZE = (n*100,m*100)
 
@@ -26,13 +28,14 @@ def main():
    screen = pygame.display.set_mode(SCREEN_SIZE)
 
    colors = {"grey":(80,80,80),"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
-             "orange":(255,165,0),"white":(255,255,255)}
+             "orange":(255,165,0),"white":(255,255,255),"brown":(160,82,45),
+             "purple":(128,0,128), "pink":(255,192,203)}
 
    won = False
 
    # Create a graph model
    dimensions = (m,n)
-   ordering = {"grey":"red","red":"blue","blue":["orange","white"],"orange":"green"}
+   ordering = {"grey":"red","red":["blue","pink"],"blue":["orange","white"],"orange":["green","purple"]}
    gates = grapher.getGateOrder(ordering)
    keys = {gate:1 for gate in gates}
    g = latticeCreator.generateViableMap(dimensions, gates, keys, .5)
@@ -102,7 +105,7 @@ def main():
             RUNNING = False
 
          if not won:
-            # Determine which square are reachable from current grid
+            # Determine which squares are reachable from current grid
             # position and over which gating types
             connections = {}
             for edge in g.edges(data=True):
