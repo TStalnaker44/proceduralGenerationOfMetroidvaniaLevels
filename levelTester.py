@@ -25,17 +25,17 @@ def main():
    #Get the screen
    screen = pygame.display.set_mode(SCREEN_SIZE)
 
-   colors = {"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
+   colors = {"grey":(80,80,80),"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
              "orange":(255,165,0),"white":(255,255,255)}
 
    won = False
 
    # Create a graph model
    dimensions = (m,n)
-   ordering = {"red":"blue","blue":["orange","white"],"orange":"green"}
+   ordering = {"grey":"red","red":"blue","blue":["orange","white"],"orange":"green"}
    gates = grapher.getGateOrder(ordering)
    keys = {gate:1 for gate in gates}
-   g = latticeCreator.generateViableMap(dimensions, gates, keys)
+   g = latticeCreator.generateViableMap(dimensions, gates, keys, .5)
 
    # Create rooms based on the model
    rooms, c = [], 0

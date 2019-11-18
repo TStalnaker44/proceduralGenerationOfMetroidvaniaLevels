@@ -3,16 +3,21 @@ import random, grapher
 import networkx as nx
 import matplotlib.pyplot as plt
 
-
-
 dropout = 0.4
 
 def r():
     return random.random() > dropout
 
-def detConnection(g, i, node, nodes, nodeStack, completedNodes, gates, endNode):
+def detConnection(g, i, node, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral=0):
     if not node in completedNodes:
-        gateTech = gates[random.randint(0,len(gates)-1)]
+        # If the user wants more neutral connections
+        if weightedNeutral != 0:
+            if random.random() < weightedNeutral:
+                gateTech = gates[0]
+            else:
+                gateTech = gates[random.randint(1,len(gates)-1)]
+        else:
+            gateTech = gates[random.randint(0,len(gates)-1)]
         if i == endNode or node == endNode:
             gateTech = gates[-1]
         if r():
@@ -21,7 +26,7 @@ def detConnection(g, i, node, nodes, nodeStack, completedNodes, gates, endNode):
                 nodeStack.append(node)
                 nodes.append(node)
 
-def createGraph(dimensions, gates):
+def createGraph(dimensions, gates, weightedNeutral=0):
 
     m,n = dimensions
     
@@ -40,62 +45,62 @@ def createGraph(dimensions, gates):
         # i is in the middle of the grid
         if i % n != 0 and i % n != 1 and n < i < (((m-1)*n) + 1):
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
             
         # i is on the top edge
         if 2 <= i <= n-1:
 
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
             
         # i is on the bottom edge
         elif ((m-1)*n)+2 <= i <= ((m-1)*n) + (n-1):
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
             
         # i is on the left edge
         elif i % n == 1 and (i != 1 and i != (((m-1)*n)+1)):
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
             
         # i is on the right edge
         elif i % n == 0 and (i != n and i != m*n):
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
             
         # i is on the top-left corner
         elif i == 1:
 
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
             
         # i is on the top-right corner
         elif i == n:
 
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
             
         # i is on the bottom-left corner
         elif i == ((m-1)*n) + 1:
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
             
         # i is on the bottom-right corner
         elif i == m*n:
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n)
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, m*n, weightedNeutral)
             
     return g
 
@@ -110,9 +115,9 @@ def findExplorable(g, keys):
             reachableNodes.append(edge[0])
     return reachableNodes
 
-def viableMap(dimensions, gates):
+def viableMap(dimensions, gates, weightedNeutral=0):
     
-    g = createGraph(dimensions, gates)
+    g = createGraph(dimensions, gates, weightedNeutral)
 
     # Ensure than the final node is included in the grid
     if dimensions[0]*dimensions[1] not in g:
@@ -134,11 +139,11 @@ def viableMap(dimensions, gates):
         
     return False
 
-def generateViableMap(dimensions, gates, keys):
+def generateViableMap(dimensions, gates, keys, weightedNeutral=0):
     # Create a viable map
-    g = viableMap(dimensions, gates)
+    g = viableMap(dimensions, gates, weightedNeutral)
     while not g:
-        g = viableMap(dimensions, gates)
+        g = viableMap(dimensions, gates, weightedNeutral)
     placeKeys(g, gates, keys)
     return g
 
