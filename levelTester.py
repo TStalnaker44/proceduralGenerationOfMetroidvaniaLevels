@@ -38,7 +38,12 @@ def main():
    dimensions = (m,n)
    ordering = {"grey":"red","red":["blue","pink"],"blue":["orange","white"],"orange":["green","purple"]}
    gates = grapher.getGateOrder(ordering)
+   print(gates)
    keys = {gate:1 for gate in gates}
+
+   endNode = m*n
+   print(endNode)
+   
    g = latticeCreator.generateViableMap(dimensions, gates, keys, .5)
 
    # Create rooms based on the model
@@ -136,7 +141,7 @@ def main():
 
          # If the player reaches the winning square,
          # set game to won
-         if currentSquare == m*n:
+         if currentSquare == endNode:
             won = True
 
    #Close the pygame window and quit pygame

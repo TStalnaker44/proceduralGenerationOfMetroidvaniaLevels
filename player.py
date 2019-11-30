@@ -65,11 +65,11 @@ class Player():
                 # Update the player's current grid position (row-1)
                 self._gridPos[0] -= 1
 
-            # If the down arrow is pressed, the current row is less than the number of columns,
+            # If the down arrow is pressed, the current row is less than the number of rows,
             # the below square is in the list of connected nodes, and
             # the key required to cross that gate is in the player's key collection
             elif event.key == pygame.K_DOWN and \
-                 self._gridPos[0]+1 < self._gridSize[1] and \
+                 self._gridPos[0]+1 < self._gridSize[0] and \
                  self.getCurrentSquare() + self._gridSize[1] in connectedNodes and \
                  connections[(self.getCurrentSquare() + self._gridSize[1])+1] in self._keys:
 
@@ -93,7 +93,7 @@ class Player():
                 # Update the player's current grid position (column-1)
                 self._gridPos[1] -= 1
 
-            # If the right arrow is pressed, the current row is less than the number of rows,
+            # If the right arrow is pressed, the current row is less than the number of columns,
             # the square to the right is in the list of connected nodes, and
             # the key required to cross that gate is in the player's key collection
             elif event.key == pygame.K_RIGHT and \
@@ -111,6 +111,7 @@ class Player():
             elif event.key == pygame.K_a: print(self._gridPos)
             elif event.key == pygame.K_s: print(connections)
             elif event.key == pygame.K_d: print(self.getCurrentSquare())
+            elif event.key == pygame.K_w: print(connectedNodes)
 
     def draw(self, surface):
         """Draw the player on the screen"""
