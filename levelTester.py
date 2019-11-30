@@ -3,18 +3,17 @@ from room import Room
 from room import Connector
 from player import Player
 
+m = random.randint(5,8) # number of rows
+n = random.randint(5,8) # number of columns
 
-x = random.randint(5,8)
-
-m = x
-n = x
-
+# Dynamically determine screen size based on grid size
 SCREEN_SIZE = (n*100,m*100)
 
 def main():
    """
    Main loop for the program
    """
+   
    #Initialize the module
    pygame.init()
    pygame.font.init()
@@ -27,10 +26,12 @@ def main():
    #Get the screen
    screen = pygame.display.set_mode(SCREEN_SIZE)
 
+   # Create a mapping from strings to rgb tuples
    colors = {"grey":(80,80,80),"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
              "orange":(255,165,0),"white":(255,255,255),"brown":(160,82,45),
              "purple":(128,0,128), "pink":(255,192,203)}
 
+   # Set the won flag to false
    won = False
 
    # Create a graph model
@@ -79,17 +80,22 @@ def main():
       #Draw the background to the screen
       screen.fill((140,50,20))
 
+      # Draw the rooms to the screen
       for room in rooms:
           room.draw(screen)
 
+      # Draw the connections between the rooms
       lines.draw(screen, (25,25))
 
+      # Draw the player to the screen
       player.draw(screen)
-
-      r = 10
+      
+      # Draw the players collected keys to the screen
+      r = 10 # Radius of orbs
       for i, orb in enumerate(player.getKeys()):
          pygame.draw.circle(screen, colors[orb], ((i+1) * int(2.5 * r) ,SCREEN_SIZE[1]-25), r)
 
+      # If the game has been won, display winning message to the screen
       if won:
          screen.blit(font.render("You Have Won", False, (0,0,0)),
                      (35*n,44*m))
@@ -98,9 +104,11 @@ def main():
 
       # event handling, gets all event from the eventqueue
       for event in pygame.event.get():
+         
          # only do something if the event is of type QUIT or K_ESCAPE
          if (event.type == pygame.QUIT) or \
              (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            
             # change the value to False, to exit the main loop
             RUNNING = False
 
@@ -116,6 +124,8 @@ def main():
             player.handleEvent(event, connections)
 
       if not won:
+         # Give the player the key in the current room
+         # if they don't already have it
          currentSquare = player.getCurrentSquare()+1
          if currentSquare in keys.values():
             for key in keys.keys():
@@ -124,6 +134,8 @@ def main():
                   player.giveKey(key)
                   break
 
+         # If the player reaches the winning square,
+         # set game to won
          if currentSquare == m*n:
             won = True
 
