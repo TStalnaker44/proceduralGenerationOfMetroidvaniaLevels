@@ -40,7 +40,7 @@ def main():
    gates = grapher.getGateOrder(ordering)
    print(gates)
    keys = {gate:1 for gate in gates}
-
+9
    endNode = m*n
    print(endNode)
    
