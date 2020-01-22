@@ -2,9 +2,11 @@ import pygame, latticeCreator, grapher, copy, random
 from room import Room
 from room import Connector
 from player import Player
+import networkx as nx
+import matplotlib.pyplot as plt
 
-m = random.randint(5,8) # number of rows
-n = random.randint(5,8) # number of columns
+m = 4#random.randint(5,8) # number of rows
+n = 4#random.randint(5,8) # number of columns
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (n*100,m*100)
@@ -36,11 +38,12 @@ def main():
 
    # Create a graph model
    dimensions = (m,n)
-   ordering = {"grey":"red","red":["blue","pink"],"blue":["orange","white"],"orange":["green","purple"]}
+   #ordering = {"grey":"red","red":["blue","pink"],"blue":["orange","white"],"orange":["green","purple"]}
+   ordering = {"grey":"red","red":"green","green":"blue"}
    gates = grapher.getGateOrder(ordering)
    print(gates)
    keys = {gate:1 for gate in gates}
-9
+   
    endNode = m*n
    print(endNode)
    
@@ -79,6 +82,7 @@ def main():
    player = Player([startPos[0]+20,startPos[1]+20], 100, (m,n))
            
    RUNNING = True
+   plot = False
 
    while RUNNING:
 
@@ -143,6 +147,29 @@ def main():
          # set game to won
          if currentSquare == endNode:
             won = True
+
+      if plot == False:
+         # Create a color mapping to visualize key locations
+         color_map = []
+         for node in g:
+             for gate in gates:
+                 if keys[gate] == node:
+                     color_map.append(gate)
+                     break
+             else:
+                 color_map.append("grey")
+
+         print(gates)
+           
+         #Display the graph
+         pos = nx.spring_layout(g)
+         #nx.draw_planar(g, with_labels=True, font_weight='bold')
+         nx.draw(g, pos, node_color=color_map, with_labels=True, font_weight='bold')
+         edge_labels = nx.get_edge_attributes(g,'object')
+         nx.draw_networkx_edge_labels(g, pos, edge_labels = edge_labels)
+         plt.show()
+
+         plot = True
 
    #Close the pygame window and quit pygame
    pygame.quit()
