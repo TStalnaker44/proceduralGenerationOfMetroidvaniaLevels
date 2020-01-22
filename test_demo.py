@@ -7,6 +7,7 @@ import pygame
 from key import Key
 from gate import Gate
 from avatar import Avatar
+from wall import Wall
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (500,500)
@@ -35,7 +36,21 @@ def main():
 
    keys = [Key((200,200),(255,0,0),0), Key((300,300),(0,255,0),1)]
 
-   gates = [Gate((400,400),(255,0,0),0),Gate((100,100),(0,255,0),1)]
+   temp = [Wall((100,450),1,0), Wall((200,400),1,0), Wall((0,100),1,0)]
+   platforms = [Gate((300,450),(0,255,0),1,1),
+                Gate((100,100),(0,255,0),1,1)]
+   for t in temp:
+      platforms += t.getComponents()
+
+   walls = [Gate((400,400),(255,0,0),0),Gate((100,100),(0,255,0),1)]
+
+##   ws = [Wall((100,60),0,0), Wall((100,140),0,0), Wall((100,60),1,0),
+##         Wall((70,60),1,0)]
+
+   comps = []
+
+##   for w in ws:
+##      comps += w.getComponents()
 
    RUNNING = True
 
@@ -50,10 +65,13 @@ def main():
       for key in keys:
           key.draw(screen)
 
-      for gate in gates:
-          gate.draw(screen)
+      for wall in walls:
+          wall.draw(screen)
 
       avatar.draw(screen)
+      
+      for w in platforms:
+         w.draw(screen)
       
       pygame.display.flip()
 
@@ -72,7 +90,7 @@ def main():
       #Calculate ticks
       ticks = gameClock.get_time() / 1000
       
-      avatar.update(WORLD_SIZE, ticks, gates)
+      avatar.update(WORLD_SIZE, ticks, platforms, walls)
 
       # Allow the avatar to collect keys
       for key in keys:

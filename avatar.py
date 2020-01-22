@@ -21,14 +21,18 @@ class Avatar(Drawable):
 
         self._velocity = Vector2(0,0)
         self._maxVelocity = 100
-        self._acceleration = 0.5
-        self._movement = {pygame.K_w:False,
-                          pygame.K_s:False,
-                          pygame.K_a:False,
-                          pygame.K_d:False}
+        self._movement = {pygame.K_LEFT:False,
+                          pygame.K_RIGHT:False}
 
         self._keys = []
 
+        self._jumpTime = 0.5
+        self._jumpTimer = 0
+
+        self._gravity = 2
+        self._friction = 0.3
+        self._jumpPower = 125
+        
     def getKeys(self):
         return self._keys
 
@@ -44,31 +48,37 @@ class Avatar(Drawable):
         elif event.type == pygame.KEYUP:
             self._movement[event.key] = False
 
-    def update(self, worldInfo, ticks, collidables):
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and\
+           self._jumpTimer <= 0:
+            self._jumpTimer = self._jumpTime
+            
+
+    def update(self, worldInfo, ticks, platforms, walls):
         """Updates the position of the star"""
 
-        #Update the velocity of the star based on the keyboard inputs
-        if self._movement[pygame.K_w]:
-            self._velocity.y = -self._maxVelocity
-        elif self._movement[pygame.K_s]:
-            self._velocity.y = self._maxVelocity
-        else:
-            self._velocity.y = 0
-            
-        if self._movement[pygame.K_a]:
+        self._accel = Vector2(0,self._gravity)
+
+        if self._jumpTimer > 0:
+            self._velocity.y = -self._jumpPower
+            self._jumpTimer -= ticks
+        
+        if self._movement[pygame.K_LEFT]:
             self._velocity.x = -self._maxVelocity
             if not self.isFlipped():
                 self.flip()
-        elif self._movement[pygame.K_d]:
+        elif self._movement[pygame.K_RIGHT]:
             self._velocity.x = self._maxVelocity
             if self.isFlipped():
                 self.flip()
         else:
-            self._velocity.x = 0
+            if self._velocity.x > 0:
+                self._velocity.x -= self._friction
+            elif self._velocity.x < 0:
+                self._velocity.x += self._friction
+            else:
+                self._velocity.x = 0
 
-        #If the current velocity exceeds the maximum, scale it down
-        if self._velocity.magnitude() > self._maxVelocity:
-            self._velocity.scale(self._maxVelocity)
+        self._velocity += self._accel
 
         #Update the position of the star based on its current velocity and ticks
         newPosition = self._position + (self._velocity * ticks)
@@ -78,44 +88,51 @@ class Avatar(Drawable):
         if (newPosition[1] + self.getHeight()) > worldInfo[1] or \
            (newPosition[1] < 0):
            self._velocity[1] = 0
+
         self._position += (self._velocity * ticks)
         
-        for other in collidables:
+        for other in platforms:
 
             # Check if the type of collidable is a gate
             if type(other) == Gate:
-                
+
+                # Check if the player can pass through a given platform
                 if not other.getType() in self._keys and \
                    self.getCollideRect().colliderect(other.getCollideRect()):
+                
+                    # Check that the player is falling
+                    if self._velocity.y > 0:
+                        # Check that the player is above the platform
+                        if self.getY() + self.getHeight()//2 < other.getY(): 
+                            #Put the player on the platform
+                            self._position.y = other.getY() - self.getHeight()
+                            self._velocity.y = 0 # Reset the player's velocity
+                            self._jumpTimer = 0 # Reset the jump timer
 
-                    # Scale the velocity of the avatar and break it into components
-                    v = self._velocity
-                    v.scale(1)
-                    vx, vy = v
+        for other in walls:
 
-                    # Determine how the avatar is intersecting with the barrier
-                    if vx > 0:
-                        x_embed = -1 * (self.getWidth() - (other.getX() - self.getX()))
-                    elif vx < 0:
-                        x_embed = (self.getX()-other.getX()) - (other.getWidth())
-                    else:
-                        x_embed = 0
-                    if vy > 0:
-                        y_embed = -1 * (self.getHeight() - (other.getY() - self.getY()))
-                    elif vy < 0:
-                        y_embed = (self.getY()-other.getY()) - other.getHeight()
-                    else:
-                        y_embed = 0
+            # Check if the type of collidable is a gate
+            if type(other) == Gate:
 
-                    # Prevent the player from being able to slide up the sides of obstacles
-                    if abs(vx) > 0 and (self.getY()>other.getY() or \
-                                        self.getY()+self.getHeight() < \
-                                        other.getY()+self.getHeight()):
-                        y_embed = 0
+                # Check if the player can pass through a given platform
+                if not other.getType() in self._keys and \
+                   self.getCollideRect().colliderect(other.getCollideRect()):
+                
+                    # Check that the player is moving right
+                    if self._velocity.x > 0:
+                        # Check that the player is above the platform
+                        if self.getX() + self.getWidth()//2 < other.getX(): 
+                            #Put the player on the platform
+                            self._position.x = other.getX() - self.getWidth()
+                            self._velocity.x = 0 # Reset the player's velocity
 
-                    # Calculate the amount and direction of pushback
-                    pushback = Vector2(vx*x_embed, vy*y_embed)
+                    # Check that the player is moving left
+                    elif self._velocity.x < 0:
+                        # Check that the player is above the platform
+                        if self.getX() + (self.getWidth()//2) > other.getX(): 
+                            #Put the player on the platform
+                            self._position.x = other.getX() + other.getWidth()
+                            self._velocity.x = 0 # Reset the player's velocity
+            
 
-                    # Apply the pushback to the avatar's position
-                    self._position += pushback
         
