@@ -119,7 +119,7 @@ def findExplorable(g, keys):
         # Find all of the edges of a given key type
         edges = [e for e in g.edges(data=True) if e[2]["object"] in keys]
 
-        # Iterate through the edges to find all reachable nodes
+        # Iterate through the edges to find all (known) reachable nodes
         for edge in edges:
             if not edge in reachableNodes:
                 if edge[0] in reachableNodes and edge[1] not in reachableNodes:
@@ -130,11 +130,10 @@ def findExplorable(g, keys):
         # Stop iterating if no new nodes were added
         if prevLen == len(reachableNodes):
             break
+        # Save the new count of reachable nodes
         else:
             prevLen = len(reachableNodes)
             
-    print([e[0] for e in edges])
-    print([e[1] for e in edges])
     return reachableNodes
 
 def viableMap(dimensions, gates, weightedNeutral=0, endNode=None):
@@ -175,12 +174,9 @@ def generateViableMap(dimensions, gates, keys, weightedNeutral=0, endNode=None):
 def placeKeys(g, gates, keys):
     # Find random key locations within explorable zones
     for x in range(0, len(gates)-1):
-        print(gates[x])
         previouslyExplorable = set(findExplorable(g, gates[:x]))
         nowExplorable = set(findExplorable(g, gates[:x+1]))
-        print("Explorable:",nowExplorable)
         newAreas = list(nowExplorable - previouslyExplorable)
-        print("New Areas:",newAreas)
         keyLocation = random.choice(newAreas)
         keys[gates[x+1]] = keyLocation
 

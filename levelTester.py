@@ -5,8 +5,8 @@ from player import Player
 import networkx as nx
 import matplotlib.pyplot as plt
 
-m = 4#random.randint(5,8) # number of rows
-n = 4#random.randint(5,8) # number of columns
+m = 8#random.randint(5,8) # number of rows
+n = 8#random.randint(5,8) # number of columns
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (n*100,m*100)
@@ -39,7 +39,7 @@ def main():
    # Create a graph model
    dimensions = (m,n)
    #ordering = {"grey":"red","red":["blue","pink"],"blue":["orange","white"],"orange":["green","purple"]}
-   ordering = {"grey":"red","red":"green","green":"blue"}
+   ordering = {"grey":["red","white"],"red":"green","green":"blue","blue":"purple"}
    gates = grapher.getGateOrder(ordering)
    print(gates)
    keys = {gate:1 for gate in gates}
@@ -82,7 +82,7 @@ def main():
    player = Player([startPos[0]+20,startPos[1]+20], 100, (m,n))
            
    RUNNING = True
-   plot = False
+   plot = True#False
 
    while RUNNING:
 
