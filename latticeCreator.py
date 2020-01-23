@@ -106,9 +106,9 @@ def createGraph(dimensions, gates, weightedNeutral=0, endNode=None):
             
     return g
 
-def findExplorable(g, keys):
+def findExplorable(g, keys, startNode=1):
     """Return a list of nodes that are reachable from start using various keys"""
-    reachableNodes = [1]
+    reachableNodes = [startNode]
     prevLen = len(reachableNodes)
 
     # Take multiple passes to try and find edges that may have actually been reachable
@@ -136,7 +136,7 @@ def findExplorable(g, keys):
             
     return reachableNodes
 
-def viableMap(dimensions, gates, weightedNeutral=0, endNode=None):
+def viableMap(dimensions, gates, weightedNeutral=0, endNode=None, startNode=1):
 
     if endNode == None:
         endNode = dimensions[0] * dimensions[1]
@@ -149,8 +149,8 @@ def viableMap(dimensions, gates, weightedNeutral=0, endNode=None):
 
     # Ensure that the explorable area grows with new key discoveries
     for x in range(1, len(gates)):
-        if len(findExplorable(g, gates[:x])) == \
-           len(findExplorable(g, gates[:x+1])):
+        if len(findExplorable(g, gates[:x], startNode)) == \
+           len(findExplorable(g, gates[:x+1], startNode)):
             return False
         
     # Find all the red edges
@@ -163,19 +163,19 @@ def viableMap(dimensions, gates, weightedNeutral=0, endNode=None):
         
     return False
 
-def generateViableMap(dimensions, gates, keys, weightedNeutral=0, endNode=None):
+def generateViableMap(dimensions, gates, keys, weightedNeutral=0, endNode=None, startNode=1):
     # Create a viable map
-    g = viableMap(dimensions, gates, weightedNeutral, endNode)
+    g = viableMap(dimensions, gates, weightedNeutral, endNode, startNode)
     while not g:
-        g = viableMap(dimensions, gates, weightedNeutral, endNode)
-    placeKeys(g, gates, keys)
+        g = viableMap(dimensions, gates, weightedNeutral, endNode, startNode)
+    placeKeys(g, gates, keys, startNode)
     return g
 
-def placeKeys(g, gates, keys):
+def placeKeys(g, gates, keys, startNode):
     # Find random key locations within explorable zones
     for x in range(0, len(gates)-1):
-        previouslyExplorable = set(findExplorable(g, gates[:x]))
-        nowExplorable = set(findExplorable(g, gates[:x+1]))
+        previouslyExplorable = set(findExplorable(g, gates[:x], startNode))
+        nowExplorable = set(findExplorable(g, gates[:x+1], startNode))
         newAreas = list(nowExplorable - previouslyExplorable)
         keyLocation = random.choice(newAreas)
         keys[gates[x+1]] = keyLocation

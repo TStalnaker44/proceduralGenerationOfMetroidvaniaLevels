@@ -3,7 +3,7 @@ import pygame
 
 class Player():
 
-    def __init__(self, pos, stepSize, gridSize):
+    def __init__(self, pos, stepSize, gridSize, startNode):
 
         # Create the square image of the player
         self._width = 15
@@ -18,7 +18,7 @@ class Player():
         self._step = stepSize
 
         # Set the initial grid position of the player (row x column)
-        self._gridPos = [0,0]
+        self._gridPos = [(startNode-1) // gridSize[0],(startNode-1)%gridSize[1]]
 
         # Save an internal datastructure containing the external grid size
         self._gridSize = gridSize

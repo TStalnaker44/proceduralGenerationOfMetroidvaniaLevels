@@ -52,6 +52,10 @@ def main():
 ##   for w in ws:
 ##      comps += w.getComponents()
 
+   greenGate = [Gate((300,200),(0,255,0),1),
+             Gate((300,160),(120,120,120),99),
+             Gate((300,240),(120,120,120),99)]
+
    RUNNING = True
 
    while RUNNING:
@@ -72,6 +76,9 @@ def main():
       
       for w in platforms:
          w.draw(screen)
+
+      for c in greenGate:
+         c.draw(screen)
       
       pygame.display.flip()
 
