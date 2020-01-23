@@ -1,6 +1,7 @@
-import pygame, latticeCreator, grapher, copy, random
+import pygame, latticeCreator, grapher, copy, random, pickle
 from room import Room
 from room import Connector
+from mapdata import MapData
 from player import Player
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -38,6 +39,25 @@ class LevelTester():
       self._gates = grapher.getGateOrder(ordering)
       self._keys = {gate:1 for gate in self._gates}   
       self._g = latticeCreator.generateViableMap(dimensions, self._gates, self._keys, .5)
+
+   def loadMap(self, fileName):
+      
+      with open(fileName, "rb") as pFile:
+         md = pickle.load(pFile)
+      self._g       =  md._g
+      self._keys    =  md._keys
+      self._gates   =  md._gates
+      self._m       =  md._m
+      self._n       =  md._n
+      self._endNode =  md._endNode
+
+      self.prepareMap()
+      self._won = False
+
+   def saveMap(self, fileName):
+      md = MapData(self._g, self._keys, self._gates, self._m, self._n, self._endNode)
+      with open(fileName, "wb") as pFile:
+         pickle.dump(md, pFile, protocol=pickle.HIGHEST_PROTOCOL)
 
    def prepareMap(self):
       # Create rooms based on the model
@@ -107,6 +127,12 @@ class LevelTester():
 
       if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
          self.plot()
+
+      if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+         self.saveMap("storedMap.mapdat")
+
+      if event.type == pygame.KEYDOWN and event.key == pygame.K_l:
+         self.loadMap("storedMap.mapdat")
 
    def update(self):
       if not self._won:
