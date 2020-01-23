@@ -1,4 +1,12 @@
-import pygame, latticeCreator, grapher, copy, random, pickle
+"""
+Author: Trevor Stalnaker
+File: levelTester
+Description:
+    Provides a visual, interactive way to experiment with generated
+    metroidvannia style mappings
+"""
+
+import pygame, latticeCreator, grapher, copy, random, pickle, glob
 from room import Room
 from room import Connector
 from mapdata import MapData
@@ -7,8 +15,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from graphics import *
 
-m = 4#random.randint(5,8) # number of rows
-n = 4#random.randint(5,8) # number of columns
+m = random.randint(5,8) # number of rows
+n = random.randint(5,8) # number of columns
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (n*100,m*100)
@@ -19,21 +27,24 @@ class LevelTester():
       self._font = pygame.font.SysFont("Times New Roman", 32)
       self._colors = {"grey":(80,80,80),"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
              "orange":(255,165,0),"white":(255,255,255),"brown":(160,82,45),
-             "purple":(128,0,128), "pink":(255,192,203)}
+             "purple":(128,0,128), "pink":(255,192,203),"yellow":(255,255,0)}
       self._SCREEN_SIZE = screen_size
-      self._won     =  False
-      self._player  =  None
-      self._g       =  None
-      self._keys    =  None
-      self._gates   =  None
-      self._m       =  None
-      self._n       =  None
-      self._endNode =  None
+      self._won      =  False
+      self._player   =  None
+      self._g        =  None
+      self._keys     =  None
+      self._gates    =  None
+      self._m        =  None
+      self._n        =  None
+      self._endNode  =  None
+      self._ordering =  None
 
    def makeMap(self, m, n, ordering):
+      """Create a map with dimensions m x n, obeying the given gate ordering"""
       self._m = m
       self._n = n
       self._endNode = n*m
+      self._ordering = ordering
       # Create a graph model
       dimensions = (m,n)
       self._gates = grapher.getGateOrder(ordering)
@@ -41,25 +52,36 @@ class LevelTester():
       self._g = latticeCreator.generateViableMap(dimensions, self._gates, self._keys, .5)
 
    def loadMap(self, fileName):
-      
+      """Load a map saved to file"""
       with open(fileName, "rb") as pFile:
          md = pickle.load(pFile)
-      self._g       =  md._g
-      self._keys    =  md._keys
-      self._gates   =  md._gates
-      self._m       =  md._m
-      self._n       =  md._n
-      self._endNode =  md._endNode
+      self._g        =  md._g
+      self._keys     =  md._keys
+      self._gates    =  md._gates
+      self._m        =  md._m
+      self._n        =  md._n
+      self._endNode  =  md._endNode
+      self._ordering =  md._ordering
+
+      self._SCREEN_SIZE = (self._n*100,self._m*100)
 
       self.prepareMap()
       self._won = False
 
    def saveMap(self, fileName):
-      md = MapData(self._g, self._keys, self._gates, self._m, self._n, self._endNode)
+      """Save a map to file"""
+      md = MapData(self._g, self._keys, self._gates, self._m, self._n, self._endNode,self._ordering)
       with open(fileName, "wb") as pFile:
          pickle.dump(md, pFile, protocol=pickle.HIGHEST_PROTOCOL)
 
+   def newMap(self):
+      """Create a new map using the current dimensions and gate ordering"""
+      self.makeMap(self._m, self._n, self._ordering)
+      self.prepareMap()
+      self._won = False
+
    def prepareMap(self):
+      """Prepare the graphical / displayed components of the level"""
       # Create rooms based on the model
       self._rooms, c = [], 0
       for y in range(self._m):
@@ -93,6 +115,7 @@ class LevelTester():
       self._player = Player([startPos[0]+20,startPos[1]+20], 100, (self._m,self._n))
 
    def draw(self, screen):
+      """Draw the level to the screen"""
       # Draw the rooms to the screen
       for room in self._rooms:
           room.draw(screen)
@@ -114,6 +137,7 @@ class LevelTester():
                      (35*self._n,44*self._m))
 
    def handleEvent(self, event):
+      """Handle events for the level"""
       if not self._won:
          # Determine which squares are reachable from current grid
          # position and over which gating types
@@ -125,16 +149,21 @@ class LevelTester():
                connections[edge[0]] = edge[2]["object"]
          self._player.handleEvent(event, connections)
 
-      if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
-         self.plot()
-
-      if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-         self.saveMap("storedMap.mapdat")
-
-      if event.type == pygame.KEYDOWN and event.key == pygame.K_l:
-         self.loadMap("storedMap.mapdat")
+      if event.type == pygame.KEYDOWN:   
+         if event.key == pygame.K_p:
+            self.plot()
+         elif event.key == pygame.K_s:
+            sfile = input("Name the file to be saved: ")
+            self.saveMap("maps\\" + sfile + ".mapdat")
+         elif event.key == pygame.K_l:
+            print("Files:", [x[5:][:-7] for x in glob.glob("maps/*")])
+            lfile = input("File to load: ")
+            self.loadMap("maps\\" + lfile + ".mapdat")
+         elif event.key == pygame.K_n:
+            self.newMap()
 
    def update(self):
+      """Update the level state and display"""
       if not self._won:
          # Give the player the key in the current room
          # if they don't already have it
@@ -152,6 +181,7 @@ class LevelTester():
             self._won = True
 
    def plot(self):
+      """Generate a network x plot for the level"""
       # Create a color mapping to visualize key locations
       color_map = []
       for node in self._g:
@@ -183,19 +213,20 @@ def main():
    #Update the title for the window
    pygame.display.set_caption('Level Tester')
    
-   #Get the screen
-   screen = pygame.display.set_mode(SCREEN_SIZE)
-
    #Create the Level Tester object
    level = LevelTester(SCREEN_SIZE)
-   #ordering = {"grey":["red","white"],"red":"green","green":"blue","blue":"purple"}
-   ordering = {"red":"green","green":"blue"}
+   #ordering = {"red":"green","green":"blue","blue":"white",}
+   ordering = {"grey":["red","orange"],"red":"green","green":"blue",
+               "orange":"yellow","yellow":"purple"}
    level.makeMap(m,n,ordering)
    level.prepareMap()
            
    RUNNING = True
 
    while RUNNING:
+
+      #Get the screen, allowing for dynamic sizing
+      screen = pygame.display.set_mode(level._SCREEN_SIZE)
 
       #Draw the background to the screen
       screen.fill((140,50,20))
