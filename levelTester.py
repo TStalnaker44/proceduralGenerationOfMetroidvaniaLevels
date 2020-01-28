@@ -223,12 +223,12 @@ def main():
    
    #Create the Level Tester object
    level = LevelTester(SCREEN_SIZE)
-   #ordering = {"red":"green","green":"blue","blue":"white",}
-   ordering = {"grey":["red","orange"],"red":"green","green":"blue",
-               "orange":["yellow","white"],"yellow":"purple"}
+   ordering = {"red":"green","green":"blue","blue":"white",}
+   #ordering = {"grey":["red","orange"],"red":"green","green":"blue",
+   #            "orange":["yellow","white"],"yellow":"purple"}
    
-   endNode   = 8
-   startNode = 2
+   endNode   = n*m
+   startNode = 1
    assert 0 < endNode <= n*m
    assert 0 < startNode <= n*m
    assert startNode != endNode

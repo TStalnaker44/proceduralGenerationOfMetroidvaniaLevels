@@ -3,19 +3,24 @@ Author: Trevor Stalnaker
 File: test_demo.py
 """
 
-import pygame
+import pygame, pickle, glob
+from mapdata import MapData
 from key import Key
 from gate import Gate
 from avatar import Avatar
 from wall import Wall
+import grapher, latticeCreator
+
+n = 6
+m = 4
 
 # Dynamically determine screen size based on grid size
-SCREEN_SIZE = (500,500)
+SCREEN_SIZE = (800,800)
 WORLD_SIZE = (500,500)
 
 class LevelTester():
 
-   def __init__(self):
+   def __init__(self, screen_size):
       self._font = pygame.font.SysFont("Times New Roman", 32)
       self._colors = {"grey":(80,80,80),"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
              "orange":(255,165,0),"white":(255,255,255),"brown":(160,82,45),
@@ -30,18 +35,21 @@ class LevelTester():
       self._n        =  None
       self._endNode  =  None
       self._ordering =  None
+      self._startNode = None
 
-   def makeMap(self, m, n, ordering):
+   def makeMap(self, m, n, ordering, endNode, startNode=1):
       """Create a map with dimensions m x n, obeying the given gate ordering"""
       self._m = m
       self._n = n
-      self._endNode = n*m
+      self._endNode = endNode
+      self._startNode = startNode
       self._ordering = ordering
       # Create a graph model
       dimensions = (m,n)
       self._gates = grapher.getGateOrder(ordering)
-      self._keys = {gate:1 for gate in self._gates}   
-      self._g = latticeCreator.generateViableMap(dimensions, self._gates, self._keys, .5)
+      self._keys = {gate:startNode for gate in self._gates} #This provides default start for keys  
+      self._g = latticeCreator.generateViableMap(dimensions, self._gates, self._keys,
+                                                 .5, endNode, startNode)
 
    def loadMap(self, fileName):
       """Load a map saved to file"""
@@ -55,6 +63,13 @@ class LevelTester():
       self._endNode  =  md._endNode
       self._ordering =  md._ordering
 
+      try:
+         self._startNode = md._startNode
+      except:
+         self._startNode = 1
+
+      self._SCREEN_SIZE = (self._n*100,self._m*100)
+
       self._SCREEN_SIZE = (self._n*100,self._m*100)
 
       self.prepareMap()
@@ -62,38 +77,70 @@ class LevelTester():
 
    def saveMap(self, fileName):
       """Save a map to file"""
-      md = MapData(self._g, self._keys, self._gates, self._m, self._n, self._endNode,self._ordering)
+      md = MapData(self._g, self._keys, self._gates, self._m, self._n, self._endNode,
+                   self._ordering, self._startNode)
       with open(fileName, "wb") as pFile:
          pickle.dump(md, pFile, protocol=pickle.HIGHEST_PROTOCOL)
 
    def newMap(self):
       """Create a new map using the current dimensions and gate ordering"""
-      self.makeMap(self._m, self._n, self._ordering)
+      self.makeMap(self._m, self._n, self._ordering, self._endNode)
       self.prepareMap()
       self._won = False
 
    def prepareMap(self):
       """Prepare the graphical / displayed components of the level"""
-      # Create rooms based on the model
-      self._rooms, c = [], 0
-      for y in range(self._m):
-          for x in range(self._n):
-            key =  None
-            self._rooms.append(Room(((100*x) + 25,(100*y) + 25), (c,0,0)))
-            c+=1
 
-      # Color rooms with keys
-      for key in self._keys.keys():
-         for i, room in enumerate(self._rooms):
-            if self._keys[key] == i+1:
-               room.color(self._colors[key])
-               break
+      self._connections = []
+      roomSize = (100,100)
+
+      # Save the coordinates for the rooms to be used by the generator
+      topCorners = []
+      for y in range(self._m):
+         for x in range(self._n):
+            topCorners.append((x,y))
 
       # Add connections between rooms
-      self._lines = Connector()
       for edge in self._g.edges(data=True):
          gateType = self._colors[edge[2]["object"]]
-         # Add corresponding edge form
+         r = edge[0]
+         if edge[1] == r+1:
+            r_pos = topCorners[r-1]
+            x_pos = (r_pos[0]+1) * roomSize[0]
+            y_pos = r_pos[1] * roomSize[1]
+            self._connections.append(Gate((x_pos, y_pos),gateType, None, 0, (10,100)))
+            if not (r, r+n) in self._g.edges:
+               r_pos = topCorners[r-1]
+               x_pos = r_pos[0] * roomSize[0]
+               y_pos = (r_pos[1]+1) * roomSize[1]
+               self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 1, (10,100)))
+         elif edge[1] == r+n:
+            r_pos = topCorners[r-1]
+            x_pos = r_pos[0] * roomSize[0]
+            y_pos = (r_pos[1]+1) * roomSize[1]
+            self._connections.append(Gate((x_pos, y_pos),gateType, None, 1, (10,100)))
+            if not (r, r+1) in self._g.edges:
+               r_pos = topCorners[r-1]
+               x_pos = (r_pos[0]+1) * roomSize[0]
+               y_pos = r_pos[1] * roomSize[1]
+               self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 0, (10,100)))
+         
+      # Create rooms based on the model
+##      self._rooms, c = [], 0
+##      for y in range(self._m):
+##          for x in range(self._n):
+##            key =  None
+##            self._rooms.append(Room(((100*x) + 25,(100*y) + 25), (c,0,0)))
+##            c+=1
+
+      # Color rooms with keys
+##      for key in self._keys.keys():
+##         for i, room in enumerate(self._rooms):
+##            if self._keys[key] == i+1:
+##               room.color(self._colors[key])
+##               break
+
+
          
 
       # Create a copy of the list to allow mutations without error
@@ -109,51 +156,53 @@ class LevelTester():
 
    def draw(self, screen):
       """Draw the level to the screen"""
-      # Draw the rooms to the screen
-      for room in self._rooms:
-          room.draw(screen)
-
-      # Draw the connections between the rooms
-      self._lines.draw(screen, (25,25))
-
-      # Draw the player to the screen
-      self._player.draw(screen)
-      
-      # Draw the players collected keys to the screen
-      r = 10 # Radius of orbs
-      for i, orb in enumerate(self._player.getKeys()):
-         pygame.draw.circle(screen, self._colors[orb], ((i+1) * int(2.5 * r) ,self._SCREEN_SIZE[1]-25), r)
-
-      # If the game has been won, display winning message to the screen
-      if self._won:
-         screen.blit(self._font.render("You Have Won", False, (0,0,0)),
-                     (35*self._n,44*self._m))
+      for gate in self._connections:
+         gate.draw(screen)
+##      # Draw the rooms to the screen
+##      for room in self._rooms:
+##          room.draw(screen)
+##
+##      # Draw the connections between the rooms
+##      self._lines.draw(screen, (25,25))
+##
+##      # Draw the player to the screen
+##      self._player.draw(screen)
+##      
+##      # Draw the players collected keys to the screen
+##      r = 10 # Radius of orbs
+##      for i, orb in enumerate(self._player.getKeys()):
+##         pygame.draw.circle(screen, self._colors[orb], ((i+1) * int(2.5 * r) ,self._SCREEN_SIZE[1]-25), r)
+##
+##      # If the game has been won, display winning message to the screen
+##      if self._won:
+##         screen.blit(self._font.render("You Have Won", False, (0,0,0)),
+##                     (35*self._n,44*self._m))
 
    def handleEvent(self, event):
       """Handle events for the level"""
-      if not self._won:
-         # Determine which squares are reachable from current grid
-         # position and over which gating types
-         connections = {}
-         for edge in self._g.edges(data=True):
-            if edge[0] == self._player.getCurrentSquare()+1:
-               connections[edge[1]] = edge[2]["object"]
-            elif edge[1] == self._player.getCurrentSquare()+1:
-               connections[edge[0]] = edge[2]["object"]
-         self._player.handleEvent(event, connections)
+##      if not self._won:
+##         # Determine which squares are reachable from current grid
+##         # position and over which gating types
+##         connections = {}
+##         for edge in self._g.edges(data=True):
+##            if edge[0] == self._player.getCurrentSquare()+1:
+##               connections[edge[1]] = edge[2]["object"]
+##            elif edge[1] == self._player.getCurrentSquare()+1:
+##               connections[edge[0]] = edge[2]["object"]
+##         self._player.handleEvent(event, connections)
 
-##      if event.type == pygame.KEYDOWN:   
-##         if event.key == pygame.K_p:
-##            self.plot()
-##         elif event.key == pygame.K_s:
-##            sfile = input("Name the file to be saved: ")
-##            self.saveMap("maps\\" + sfile + ".mapdat")
-##         elif event.key == pygame.K_l:
-##            print("Files:", [x[5:][:-7] for x in glob.glob("maps/*")])
-##            lfile = input("File to load: ")
-##            self.loadMap("maps\\" + lfile + ".mapdat")
-##         elif event.key == pygame.K_n:
-##            self.newMap()
+      if event.type == pygame.KEYDOWN:   
+         if event.key == pygame.K_p:
+            self.plot()
+         elif event.key == pygame.K_s:
+            sfile = input("Name the file to be saved: ")
+            self.saveMap("maps\\" + sfile + ".mapdat")
+         elif event.key == pygame.K_l:
+            print("Files:", [x[5:][:-7] for x in glob.glob("maps/*")])
+            lfile = input("File to load: ")
+            self.loadMap("maps\\" + lfile + ".mapdat")
+         elif event.key == pygame.K_n:
+            self.newMap()
 
    def update(self):
       """Update the level state and display"""
@@ -214,6 +263,20 @@ def main():
 
    avatar = Avatar((100,100))
 
+   level = LevelTester(SCREEN_SIZE)
+   ordering = {"red":"green","green":"blue","blue":"white",}
+   #ordering = {"grey":["red","orange"],"red":"green","green":"blue",
+   #            "orange":["yellow","white"],"yellow":"purple"}
+   
+   endNode   = n*m
+   startNode = 1
+   assert 0 < endNode <= n*m
+   assert 0 < startNode <= n*m
+   assert startNode != endNode
+   level.makeMap(m,n,ordering,endNode,startNode)
+   level.prepareMap()
+
+
    RUNNING = True
 
    while RUNNING:
@@ -222,7 +285,9 @@ def main():
       gameClock.tick()
 
       #Draw the background to the screen
-      screen.fill((255,255,255))
+      screen.fill((140,50,20))
+
+      level.draw(screen)
       
       pygame.display.flip()
 
@@ -237,21 +302,22 @@ def main():
             RUNNING = False
 
          avatar.move(event)
+         level.handleEvent(event)
 
       #Calculate ticks
       ticks = gameClock.get_time() / 1000
       
-      avatar.update(WORLD_SIZE, ticks, platforms, walls)
+      #avatar.update(WORLD_SIZE, ticks, platforms, walls)
 
       # Allow the avatar to collect keys
-      for key in keys:
-        if key.getCollideRect().colliderect(avatar.getCollideRect()):
-            avatar.giveKey(key.getType())
-            key.collect()
-            print(avatar._keys)
+##      for key in keys:
+##        if key.getCollideRect().colliderect(avatar.getCollideRect()):
+##            avatar.giveKey(key.getType())
+##            key.collect()
+##            print(avatar._keys)
 
       # Remove keys that have been collected
-      keys = [key for key in keys if not key.collected()]
+      #keys = [key for key in keys if not key.collected()]
 
    #Close the pygame window and quit pygame
    pygame.quit()
