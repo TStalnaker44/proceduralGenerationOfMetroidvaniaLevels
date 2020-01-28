@@ -9,6 +9,8 @@ from key import Key
 from gate import Gate
 from avatar import Avatar
 from wall import Wall
+import networkx as nx
+import matplotlib.pyplot as plt
 import grapher, latticeCreator
 
 n = 6
@@ -93,6 +95,7 @@ class LevelTester():
 
       self._connections = []
       roomSize = (100,100)
+      startCoord = (100,100)
 
       # Save the coordinates for the rooms to be used by the generator
       topCorners = []
@@ -100,39 +103,75 @@ class LevelTester():
          for x in range(self._n):
             topCorners.append((x,y))
 
+      # Get all of the distinct rooms in the map
+      rooms = []
+      for edge in self._g.edges():
+         rooms.append(edge[0])
+         rooms.append(edge[1])
+      rooms = set(rooms)
+
       # Add connections between rooms
       for edge in self._g.edges(data=True):
          gateType = self._colors[edge[2]["object"]]
          r = edge[0]
          if edge[1] == r+1:
             r_pos = topCorners[r-1]
-            x_pos = (r_pos[0]+1) * roomSize[0]
-            y_pos = r_pos[1] * roomSize[1]
+            x_pos = ((r_pos[0]+1) * roomSize[0]) + startCoord[0]
+            y_pos = (r_pos[1] * roomSize[1]) + startCoord[1]
             self._connections.append(Gate((x_pos, y_pos),gateType, None, 0, (10,100)))
-            if not (r, r+n) in self._g.edges:
-               r_pos = topCorners[r-1]
-               x_pos = r_pos[0] * roomSize[0]
-               y_pos = (r_pos[1]+1) * roomSize[1]
-               self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 1, (10,100)))
          elif edge[1] == r+n:
             r_pos = topCorners[r-1]
-            x_pos = r_pos[0] * roomSize[0]
-            y_pos = (r_pos[1]+1) * roomSize[1]
+            x_pos = (r_pos[0] * roomSize[0]) + startCoord[0]
+            y_pos = ((r_pos[1]+1) * roomSize[1]) + startCoord[1]
             self._connections.append(Gate((x_pos, y_pos),gateType, None, 1, (10,100)))
-            if not (r, r+1) in self._g.edges:
-               r_pos = topCorners[r-1]
-               x_pos = (r_pos[0]+1) * roomSize[0]
-               y_pos = r_pos[1] * roomSize[1]
-               self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 0, (10,100)))
-         
-      # Create rooms based on the model
-##      self._rooms, c = [], 0
-##      for y in range(self._m):
-##          for x in range(self._n):
-##            key =  None
-##            self._rooms.append(Room(((100*x) + 25,(100*y) + 25), (c,0,0)))
-##            c+=1
 
+      #Iterate through the rooms to add the edge walls
+      for r in rooms:
+         
+         #Add barriers to the tops of rooms
+         if r <= n:
+            x_pos = (topCorners[r-1][0]*roomSize[0]) + startCoord[0]
+            y_pos = (topCorners[r-1][1]*roomSize[1]) + startCoord[1]
+            self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 1, (10,100)))
+         elif not (r-n, r) in self._g.edges:
+            r_pos = topCorners[(r-n)-1]
+            x_pos = (r_pos[0] * roomSize[0]) + startCoord[0]
+            y_pos = ((r_pos[1]+1) * roomSize[1]) + startCoord[1]
+            self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 1, (10,100)))
+            
+         #Add barriers to the bottoms of rooms
+         if r > ((m-1)*n):
+            x_pos = (topCorners[r-1][0]*roomSize[0]) + startCoord[0]
+            y_pos = ((topCorners[r-1][1]+1)*roomSize[1]) + startCoord[1]
+            self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 1, (10,100)))
+         elif not (r, r+n) in self._g.edges:
+            r_pos = topCorners[r-1]
+            x_pos = (r_pos[0] * roomSize[0]) + startCoord[0]
+            y_pos = ((r_pos[1]+1) * roomSize[1]) + startCoord[1]
+            self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 1, (10,100)))
+            
+         #Add barriers to the lefts of rooms
+         if r % n == 1:
+            x_pos = (topCorners[r-1][0]*roomSize[0]) + startCoord[0]
+            y_pos = ((topCorners[r-1][1])*roomSize[1]) + startCoord[1]
+            self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 0, (10,100)))
+         elif not (r-1, r) in self._g.edges():
+            r_pos = topCorners[r-2]
+            x_pos = ((r_pos[0]+1) * roomSize[0]) + startCoord[0]
+            y_pos = (r_pos[1] * roomSize[1]) + startCoord[1]
+            self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 0, (10,100)))
+            
+         #Add barriers to the rights of rooms
+         if r % n == 0:
+            x_pos = ((topCorners[r-1][0]+1)*roomSize[0]) + startCoord[0]
+            y_pos = ((topCorners[r-1][1])*roomSize[1]) + startCoord[1]
+            self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 0, (10,100)))
+         elif not (r, r+1) in self._g.edges():
+            r_pos = topCorners[r-1]
+            x_pos = ((r_pos[0]+1) * roomSize[0]) + startCoord[0]
+            y_pos = (r_pos[1] * roomSize[1]) + startCoord[1]
+            self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 0, (10,100)))
+         
       # Color rooms with keys
 ##      for key in self._keys.keys():
 ##         for i, room in enumerate(self._rooms):
