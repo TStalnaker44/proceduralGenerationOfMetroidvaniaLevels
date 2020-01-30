@@ -9,6 +9,7 @@ from key import Key
 from gate import Gate
 from avatar import Avatar
 from wall import Wall, Platform
+from key import Key
 import networkx as nx
 import matplotlib.pyplot as plt
 import grapher, latticeCreator
@@ -94,6 +95,7 @@ class LevelTester():
       """Prepare the graphical / displayed components of the level"""
 
       self._connections = []
+      self._physicalKeys = []
       roomDim = 120
       roomSize = (roomDim, roomDim)
       barrierWidth = 10
@@ -186,7 +188,12 @@ class LevelTester():
             #self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 0, (10,100)))
          
       # Color rooms with keys
-##      for key in self._keys.keys():
+      for key in self._keys.keys():
+         print(self._keys[key])
+         rCoord = topCorners[self._keys[key]]
+         midCoord = (((rCoord[0]*roomSize[0]) - roomSize[0]//2)+startCoord[0],
+                     ((rCoord[1]*roomSize[1]) + roomSize[1]//2)+startCoord[1])
+         self._physicalKeys.append(Key(midCoord, self._colors[key], self._colors[key]))
 ##         for i, room in enumerate(self._rooms):
 ##            if self._keys[key] == i+1:
 ##               room.color(self._colors[key])
@@ -210,6 +217,9 @@ class LevelTester():
       """Draw the level to the screen"""
       for gate in self._connections:
          gate.draw(screen)
+
+      for key in self._physicalKeys:
+         key.draw(screen)
 ##      # Draw the rooms to the screen
 ##      for room in self._rooms:
 ##          room.draw(screen)
