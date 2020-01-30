@@ -19,7 +19,7 @@ m = 4
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (1200,800)
-WORLD_SIZE = (500,500)
+WORLD_SIZE = (1200,800)
 
 class LevelTester():
 
@@ -94,9 +94,10 @@ class LevelTester():
    def prepareMap(self):
       """Prepare the graphical / displayed components of the level"""
 
-      self._connections = []
+      self._walls = []
+      self._platforms = []
       self._physicalKeys = []
-      roomDim = 120
+      roomDim = 150
       roomSize = (roomDim, roomDim)
       barrierWidth = 10
       barrierSize = (barrierWidth,roomDim+barrierWidth)
@@ -123,14 +124,12 @@ class LevelTester():
             r_pos = topCorners[r-1]
             x_pos = ((r_pos[0]+1) * roomSize[0]) + startCoord[0]
             y_pos = (r_pos[1] * roomSize[1]) + startCoord[1]
-            #self._connections.append(Gate((x_pos, y_pos),gateType, None, 0, (10,100)))
-            self._connections.append(Wall((x_pos, y_pos), gateType, gateType, size=barrierSize))
+            self._walls.append(Wall((x_pos, y_pos), gateType, gateType, size=barrierSize))
          elif edge[1] == r+n:
             r_pos = topCorners[r-1]
             x_pos = (r_pos[0] * roomSize[0]) + startCoord[0]
             y_pos = ((r_pos[1]+1) * roomSize[1]) + startCoord[1]
-            self._connections.append(Platform((x_pos, y_pos), gateType, gateType, size=barrierSize))
-            #self._connections.append(Gate((x_pos, y_pos),gateType, None, 1, (10,100)))
+            self._platforms.append(Platform((x_pos, y_pos), gateType, gateType, size=barrierSize))
 
       #Iterate through the rooms to add the edge walls
       for r in rooms:
@@ -139,119 +138,87 @@ class LevelTester():
          if r <= n:
             x_pos = (topCorners[r-1][0]*roomSize[0]) + startCoord[0]
             y_pos = (topCorners[r-1][1]*roomSize[1]) + startCoord[1]
-            self._connections.append(Platform((x_pos, y_pos), 0, size=barrierSize))
-            #self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 1, (10,100)))
+            self._platforms.append(Platform((x_pos, y_pos), 0, size=barrierSize))
          elif not (r-n, r) in self._g.edges:
             r_pos = topCorners[(r-n)-1]
             x_pos = (r_pos[0] * roomSize[0]) + startCoord[0]
             y_pos = ((r_pos[1]+1) * roomSize[1]) + startCoord[1]
-            self._connections.append(Platform((x_pos, y_pos), 0, size=barrierSize))
-            #self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 1, (10,100)))
+            self._platforms.append(Platform((x_pos, y_pos), 0, size=barrierSize))
             
          #Add barriers to the bottoms of rooms
          if r > ((m-1)*n):
             x_pos = (topCorners[r-1][0]*roomSize[0]) + startCoord[0]
             y_pos = ((topCorners[r-1][1]+1)*roomSize[1]) + startCoord[1]
-            self._connections.append(Platform((x_pos, y_pos), 0, size=barrierSize))
-            #self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 1, (10,100)))
+            self._platforms.append(Platform((x_pos, y_pos), 0, size=barrierSize))
          elif not (r, r+n) in self._g.edges:
             r_pos = topCorners[r-1]
             x_pos = (r_pos[0] * roomSize[0]) + startCoord[0]
             y_pos = ((r_pos[1]+1) * roomSize[1]) + startCoord[1]
-            self._connections.append(Platform((x_pos, y_pos), 0, size=barrierSize))
-            #self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 1, (10,100)))
+            self._platforms.append(Platform((x_pos, y_pos), 0, size=barrierSize))
             
          #Add barriers to the lefts of rooms
          if r % n == 1:
             x_pos = (topCorners[r-1][0]*roomSize[0]) + startCoord[0]
             y_pos = ((topCorners[r-1][1])*roomSize[1]) + startCoord[1]
-            self._connections.append(Wall((x_pos, y_pos), 0, size=barrierSize))
-            #self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 0, (10,100)))
+            self._walls.append(Wall((x_pos, y_pos), 0, size=barrierSize))
          elif not (r-1, r) in self._g.edges():
             r_pos = topCorners[r-2]
             x_pos = ((r_pos[0]+1) * roomSize[0]) + startCoord[0]
             y_pos = (r_pos[1] * roomSize[1]) + startCoord[1]
-            self._connections.append(Wall((x_pos, y_pos), 0, size=barrierSize))
-            #self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 0, (10,100)))
+            self._walls.append(Wall((x_pos, y_pos), 0, size=barrierSize))
             
          #Add barriers to the rights of rooms
          if r % n == 0:
             x_pos = ((topCorners[r-1][0]+1)*roomSize[0]) + startCoord[0]
             y_pos = ((topCorners[r-1][1])*roomSize[1]) + startCoord[1]
-            self._connections.append(Wall((x_pos, y_pos), 0, size=barrierSize))
-            #self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 0, (10,100)))
+            self._walls.append(Wall((x_pos, y_pos), 0, size=barrierSize))
          elif not (r, r+1) in self._g.edges():
             r_pos = topCorners[r-1]
             x_pos = ((r_pos[0]+1) * roomSize[0]) + startCoord[0]
             y_pos = (r_pos[1] * roomSize[1]) + startCoord[1]
-            self._connections.append(Wall((x_pos, y_pos), 0, size=barrierSize))
-            #self._connections.append(Gate((x_pos, y_pos),(120,120,120), None, 0, (10,100)))
+            self._walls.append(Wall((x_pos, y_pos), 0, size=barrierSize))
          
-      # Color rooms with keys
+      # Add Keys to the Rooms
       for key in self._keys.keys():
-         print(self._keys[key])
-         rCoord = topCorners[self._keys[key]]
-         midCoord = (((rCoord[0]*roomSize[0]) - roomSize[0]//2)+startCoord[0],
+         rCoord = topCorners[self._keys[key]-1]
+         midCoord = (((rCoord[0]*roomSize[0]) + roomSize[0]//2)+startCoord[0],
                      ((rCoord[1]*roomSize[1]) + roomSize[1]//2)+startCoord[1])
          self._physicalKeys.append(Key(midCoord, self._colors[key], self._colors[key]))
-##         for i, room in enumerate(self._rooms):
-##            if self._keys[key] == i+1:
-##               room.color(self._colors[key])
-##               break
-
-
-         
-
-      # Create a copy of the list to allow mutations without error
-##      roomCopy = copy.copy(self._rooms)
-##      for x in range(len(roomCopy)):
-##          # Remove rooms that are not part of the graph
-##          if not x+1 in self._g:
-##              self._rooms.remove(roomCopy[x])
 
       # Create a player object
-##      startPos = self._rooms[0].getCenter()
-##      self._player = Player([startPos[0]+20,startPos[1]+20], 100, (self._m,self._n))
+      startPos = ((topCorners[0][0]+(roomSize[0]//2))+startCoord[0],
+                  (topCorners[0][1]+(roomSize[1]//2))+startCoord[1])
+      self._player = Avatar(startPos)
+
+      self._platformParts = []
+      for p in self._platforms:
+         self._platformParts.extend(p.getComponents())
+      self._wallParts = []
+      for w in self._walls:
+         self._wallParts.extend(w.getComponents())
 
    def draw(self, screen):
       """Draw the level to the screen"""
-      for gate in self._connections:
+      for gate in self._walls:
+         gate.draw(screen)
+
+      for gate in self._platforms:
          gate.draw(screen)
 
       for key in self._physicalKeys:
          key.draw(screen)
-##      # Draw the rooms to the screen
-##      for room in self._rooms:
-##          room.draw(screen)
-##
-##      # Draw the connections between the rooms
-##      self._lines.draw(screen, (25,25))
-##
-##      # Draw the player to the screen
-##      self._player.draw(screen)
-##      
-##      # Draw the players collected keys to the screen
-##      r = 10 # Radius of orbs
-##      for i, orb in enumerate(self._player.getKeys()):
-##         pygame.draw.circle(screen, self._colors[orb], ((i+1) * int(2.5 * r) ,self._SCREEN_SIZE[1]-25), r)
-##
-##      # If the game has been won, display winning message to the screen
-##      if self._won:
-##         screen.blit(self._font.render("You Have Won", False, (0,0,0)),
-##                     (35*self._n,44*self._m))
+
+      self._player.draw(screen)
+
+      # Draw the players collected keys to the screen
+      r = 10 # Radius of orbs
+      for i, orb in enumerate(self._player.getKeys()):
+         pygame.draw.circle(screen, orb, ((i+1) * int(2.5 * r) ,self._SCREEN_SIZE[1]-25), r)
 
    def handleEvent(self, event):
       """Handle events for the level"""
-##      if not self._won:
-##         # Determine which squares are reachable from current grid
-##         # position and over which gating types
-##         connections = {}
-##         for edge in self._g.edges(data=True):
-##            if edge[0] == self._player.getCurrentSquare()+1:
-##               connections[edge[1]] = edge[2]["object"]
-##            elif edge[1] == self._player.getCurrentSquare()+1:
-##               connections[edge[0]] = edge[2]["object"]
-##         self._player.handleEvent(event, connections)
+
+      self._player.move(event)
 
       if event.type == pygame.KEYDOWN:   
          if event.key == pygame.K_p:
@@ -266,23 +233,19 @@ class LevelTester():
          elif event.key == pygame.K_n:
             self.newMap()
 
-   def update(self):
+   def update(self, worldsize, ticks):
       """Update the level state and display"""
-      if not self._won:
-         # Give the player the key in the current room
-         # if they don't already have it
-         currentSquare = self._player.getCurrentSquare()+1
-         if currentSquare in self._keys.values():
-            for key in self._keys.keys():
-               if key not in self._player.getKeys() and \
-                  self._keys[key] == currentSquare:
-                  self._player.giveKey(key)
-                  break
 
-         # If the player reaches the winning square,
-         # set game to won
-         if currentSquare == self._endNode:
-            self._won = True
+      self._player.update(worldsize, ticks, self._platformParts, self._wallParts)
+      
+      # Allow the avatar to collect keys
+      for key in self._physicalKeys:
+        if key.getCollideRect().colliderect(self._player.getCollideRect()):
+            self._player.giveKey(key.getType())
+            key.collect()
+
+      # Remove keys that have been collected
+      self._physicalKeys = [key for key in self._physicalKeys if not key.collected()]
 
    def plot(self):
       """Generate a network x plot for the level"""
@@ -363,12 +326,13 @@ def main():
             # change the value to False, to exit the main loop
             RUNNING = False
 
-         avatar.move(event)
+         #avatar.move(event)
          level.handleEvent(event)
 
       #Calculate ticks
       ticks = gameClock.get_time() / 1000
       
+      level.update(WORLD_SIZE, ticks)
       #avatar.update(WORLD_SIZE, ticks, platforms, walls)
 
       # Allow the avatar to collect keys

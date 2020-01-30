@@ -22,7 +22,9 @@ class Avatar(Drawable):
         self._velocity = Vector2(0,0)
         self._maxVelocity = 100
         self._movement = {pygame.K_LEFT:False,
-                          pygame.K_RIGHT:False}
+                          pygame.K_RIGHT:False,
+                          pygame.K_UP:False,
+                          pygame.K_DOWN:False}
 
         self._keys = []
 
@@ -48,19 +50,19 @@ class Avatar(Drawable):
         elif event.type == pygame.KEYUP:
             self._movement[event.key] = False
 
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and\
-           self._jumpTimer <= 0:
-            self._jumpTimer = self._jumpTime
+        #if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and\
+        #   self._jumpTimer <= 0:
+        #    self._jumpTimer = self._jumpTime
             
 
     def update(self, worldInfo, ticks, platforms, walls):
         """Updates the position of the star"""
 
-        self._accel = Vector2(0,self._gravity)
+        #self._accel = Vector2(0,self._gravity)
 
-        if self._jumpTimer > 0:
-            self._velocity.y = -self._jumpPower
-            self._jumpTimer -= ticks
+        #if self._jumpTimer > 0:
+        #    self._velocity.y = -self._jumpPower
+        #    self._jumpTimer -= ticks
         
         if self._movement[pygame.K_LEFT]:
             self._velocity.x = -self._maxVelocity
@@ -78,7 +80,19 @@ class Avatar(Drawable):
             else:
                 self._velocity.x = 0
 
-        self._velocity += self._accel
+        if self._movement[pygame.K_UP]:
+            self._velocity.y = -self._maxVelocity
+        elif self._movement[pygame.K_DOWN]:
+            self._velocity.y = self._maxVelocity
+        else:
+            if self._velocity.y > 0:
+                self._velocity.y -= self._friction
+            elif self._velocity.y < 0:
+                self._velocity.y += self._friction
+            else:
+                self._velocity.y = 0
+
+        #self._velocity += self._accel
 
         #Update the position of the star based on its current velocity and ticks
         newPosition = self._position + (self._velocity * ticks)
@@ -108,6 +122,14 @@ class Avatar(Drawable):
                             self._position.y = other.getY() - self.getHeight()
                             self._velocity.y = 0 # Reset the player's velocity
                             self._jumpTimer = 0 # Reset the jump timer
+
+                    # Check that the player is jumping
+                    elif self._velocity.y < 0:
+                        # Check that the player is above the platform
+                        if self.getY() + (self.getHeight()//2)  > other.getY(): 
+                            #Put the player on the platform
+                            self._position.y = other.getY() + other.getHeight()
+                            self._velocity.y = 0 # Reset the player's velocity
 
         for other in walls:
 
