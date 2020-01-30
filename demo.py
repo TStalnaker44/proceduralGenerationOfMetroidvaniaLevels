@@ -13,9 +13,10 @@ from key import Key
 import networkx as nx
 import matplotlib.pyplot as plt
 import grapher, latticeCreator
+from graphics import MySurface
 
-n = 24#6
-m = 16#4
+n = 6
+m = 4
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (1200,800)
@@ -187,8 +188,8 @@ class LevelTester():
          self._physicalKeys.append(Key(midCoord, self._colors[key], self._colors[key]))
 
       # Create a player object
-      startPos = ((topCorners[0][0]+(roomSize[0]//2))+startCoord[0],
-                  (topCorners[0][1]+(roomSize[1]//2))+startCoord[1])
+      startPos = (((topCorners[self._startNode-1][0]*roomSize[0])+(roomSize[0]//2))+startCoord[0],
+                  ((topCorners[self._startNode-1][1]*roomSize[1])+(roomSize[1]//2))+startCoord[1])
       self._player = Avatar(startPos)
 
       self._platformParts = []
@@ -198,8 +199,20 @@ class LevelTester():
       for w in self._walls:
          self._wallParts.extend(w.getComponents())
 
+      s = pygame.Surface((roomSize[0]//2, roomSize[1]//2))
+      s.fill((212, 175, 55))
+      topCorner = topCorners[self._endNode-1]
+      pos = (((topCorner[0]*roomSize[0])+(roomSize[0]//4)) + startCoord[0] + barrierWidth//2,
+             ((topCorner[1]*roomSize[1])+(roomSize[1]//4)) + startCoord[1] + barrierWidth//2)
+      self._finish = MySurface(s, pos)
+      self._finish._worldBound = True
+      
+
    def draw(self, screen):
       """Draw the level to the screen"""
+
+      self._finish.draw(screen)
+      
       for gate in self._walls:
          gate.draw(screen)
 
@@ -304,8 +317,8 @@ def main():
    #ordering = {"grey":["red","orange"],"red":"green","green":"blue",
    #            "orange":["yellow","white"],"yellow":"purple"}
    
-   endNode   = n*m
-   startNode = 1
+   endNode   = 5#n*m
+   startNode = 3
    assert 0 < endNode <= n*m
    assert 0 < startNode <= n*m
    assert startNode != endNode
