@@ -41,6 +41,10 @@ class Wall():
     def getComponents(self):
         return self._components
 
+    def update(self, worldsize, ticks):
+        for component in self._components:
+            component.update(worldsize, ticks)
+
 
 class Platform():
 
@@ -78,4 +82,8 @@ class Platform():
 
     def getComponents(self):
         return self._components
+
+    def update(self, worldsize, ticks):
+        for component in self._components:
+            component.update(worldsize, ticks)
 

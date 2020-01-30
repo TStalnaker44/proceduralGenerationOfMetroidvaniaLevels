@@ -14,21 +14,22 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import grapher, latticeCreator
 
-n = 6
-m = 4
+n = 24#6
+m = 16#4
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (1200,800)
-WORLD_SIZE = (1200,800)
+WORLD_SIZE = (10000,10000)
 
 class LevelTester():
 
-   def __init__(self, screen_size):
+   def __init__(self, screen_size, world_size):
       self._font = pygame.font.SysFont("Times New Roman", 32)
       self._colors = {"grey":(80,80,80),"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
              "orange":(255,165,0),"white":(255,255,255),"brown":(160,82,45),
              "purple":(128,0,128), "pink":(255,192,203),"yellow":(255,255,0)}
       self._SCREEN_SIZE = screen_size
+      self._WORLD_SIZE = world_size
       self._won      =  False
       self._player   =  None
       self._g        =  None
@@ -236,6 +237,9 @@ class LevelTester():
    def update(self, worldsize, ticks):
       """Update the level state and display"""
 
+      #Update the offset based on the stars location
+      self._player.updateOffset(self._player, self._SCREEN_SIZE, self._WORLD_SIZE)
+
       self._player.update(worldsize, ticks, self._platformParts, self._wallParts)
       
       # Allow the avatar to collect keys
@@ -243,9 +247,16 @@ class LevelTester():
         if key.getCollideRect().colliderect(self._player.getCollideRect()):
             self._player.giveKey(key.getType())
             key.collect()
+##        key.update(self._WORLD_SIZE, ticks)
 
       # Remove keys that have been collected
       self._physicalKeys = [key for key in self._physicalKeys if not key.collected()]
+
+##      for wall in self._walls:
+##         wall.update(self._WORLD_SIZE, ticks)
+##
+##      for platform in self._platforms:
+##         platform.update(self._WORLD_SIZE, ticks)
 
    def plot(self):
       """Generate a network x plot for the level"""
@@ -288,7 +299,7 @@ def main():
 
    avatar = Avatar((100,100))
 
-   level = LevelTester(SCREEN_SIZE)
+   level = LevelTester(SCREEN_SIZE, WORLD_SIZE)
    ordering = {"red":"green","green":"blue","blue":"white",}
    #ordering = {"grey":["red","orange"],"red":"green","green":"blue",
    #            "orange":["yellow","white"],"yellow":"purple"}

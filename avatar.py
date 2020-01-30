@@ -73,24 +73,24 @@ class Avatar(Drawable):
             if self.isFlipped():
                 self.flip()
         else:
-            if self._velocity.x > 0:
-                self._velocity.x -= self._friction
-            elif self._velocity.x < 0:
-                self._velocity.x += self._friction
-            else:
-                self._velocity.x = 0
+##            if self._velocity.x > 0:
+##                self._velocity.x -= self._friction
+##            elif self._velocity.x < 0:
+##                self._velocity.x += self._friction
+##            else:
+            self._velocity.x = 0
 
         if self._movement[pygame.K_UP]:
             self._velocity.y = -self._maxVelocity
         elif self._movement[pygame.K_DOWN]:
             self._velocity.y = self._maxVelocity
         else:
-            if self._velocity.y > 0:
-                self._velocity.y -= self._friction
-            elif self._velocity.y < 0:
-                self._velocity.y += self._friction
-            else:
-                self._velocity.y = 0
+##            if self._velocity.y > 0:
+##                self._velocity.y -= self._friction
+##            elif self._velocity.y < 0:
+##                self._velocity.y += self._friction
+##            else:
+            self._velocity.y = 0
 
         #self._velocity += self._accel
 
