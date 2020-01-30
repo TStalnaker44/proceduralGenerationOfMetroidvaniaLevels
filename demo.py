@@ -15,11 +15,11 @@ import matplotlib.pyplot as plt
 import grapher, latticeCreator
 from graphics import MySurface
 
-n = 6
-m = 4
+n = 15 #6
+m = 10 #4
 
 # Dynamically determine screen size based on grid size
-SCREEN_SIZE = (1200,800)
+SCREEN_SIZE = (800,500)
 WORLD_SIZE = (10000,10000)
 
 class LevelTester():
@@ -89,7 +89,7 @@ class LevelTester():
 
    def newMap(self):
       """Create a new map using the current dimensions and gate ordering"""
-      self.makeMap(self._m, self._n, self._ordering, self._endNode)
+      self.makeMap(self._m, self._n, self._ordering, self._endNode, self._startNode)
       self.prepareMap()
       self._won = False
 
@@ -229,10 +229,18 @@ class LevelTester():
       for i, orb in enumerate(self._player.getKeys()):
          pygame.draw.circle(screen, orb, ((i+1) * int(2.5 * r) ,self._SCREEN_SIZE[1]-25), r)
 
+      # If the game has been won, display winning message to the screen
+      if self._won:
+         screen.blit(self._font.render("You Have Won", False, (0,0,0)),
+                     (self._SCREEN_SIZE[0]//2,self._SCREEN_SIZE[1]//2))
+
    def handleEvent(self, event):
       """Handle events for the level"""
 
-      self._player.move(event)
+      if not self._won:
+         self._player.move(event)
+      else:
+         for k in self._player._movement.keys(): self._player._movement[k] = False
 
       if event.type == pygame.KEYDOWN:   
          if event.key == pygame.K_p:
@@ -260,16 +268,12 @@ class LevelTester():
         if key.getCollideRect().colliderect(self._player.getCollideRect()):
             self._player.giveKey(key.getType())
             key.collect()
-##        key.update(self._WORLD_SIZE, ticks)
 
       # Remove keys that have been collected
       self._physicalKeys = [key for key in self._physicalKeys if not key.collected()]
 
-##      for wall in self._walls:
-##         wall.update(self._WORLD_SIZE, ticks)
-##
-##      for platform in self._platforms:
-##         platform.update(self._WORLD_SIZE, ticks)
+      if self._player.getCollideRect().colliderect(self._finish.getCollideRect()):
+         self._won = True
 
    def plot(self):
       """Generate a network x plot for the level"""
@@ -313,9 +317,9 @@ def main():
    avatar = Avatar((100,100))
 
    level = LevelTester(SCREEN_SIZE, WORLD_SIZE)
-   ordering = {"red":"green","green":"blue","blue":"white",}
-   #ordering = {"grey":["red","orange"],"red":"green","green":"blue",
-   #            "orange":["yellow","white"],"yellow":"purple"}
+   #ordering = {"red":"green","green":"blue","blue":"white",}
+   ordering = {"grey":["red","orange"],"red":"green","green":"blue",
+               "orange":["yellow","white"],"yellow":"purple"}
    
    endNode   = 5#n*m
    startNode = 3
