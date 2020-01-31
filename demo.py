@@ -231,7 +231,8 @@ class LevelTester():
       r = 10 # Radius of orbs
       for i, orb in enumerate(self._player.getKeys()):
          color = self._colors.get(orb, None)
-         pygame.draw.circle(screen, color, ((i+1) * int(2.5 * r) ,self._SCREEN_SIZE[1]-25), r)
+         if color != None:
+            pygame.draw.circle(screen, color, ((i+1) * int(2.5 * r) ,self._SCREEN_SIZE[1]-25), r)
 
       # If the game has been won, display winning message to the screen
       if self._won:
@@ -321,9 +322,9 @@ def main():
    avatar = Avatar((100,100))
 
    level = LevelTester(SCREEN_SIZE, WORLD_SIZE)
-   #ordering = {"red":"green","green":"blue","blue":"white",}
-   ordering = {"grey":["red","orange"],"red":"green","green":"blue",
-               "orange":["yellow","white"],"yellow":"purple"}
+   ordering = {"neutral":"red","red":"green","green":"blue","blue":"white",}
+   #ordering = {"grey":["red","orange"],"red":"green","green":"blue",
+   #            "orange":["yellow","white"],"yellow":"purple"}
    
    endNode   = 5#n*m
    startNode = 3

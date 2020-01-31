@@ -12,9 +12,9 @@ class Key(Drawable):
         super().__init__("", position)
         self._width = 15
         self._height = 15
+        self._color = color if color != None else (0,0,0)
         self._image = pygame.Surface((self._width, self._height))
-        self._image.fill(color)
-        self._color = color
+        self._image.fill(self._color)
 
         self._collected = False
         self._type = keyType

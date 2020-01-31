@@ -25,10 +25,13 @@ class Wall():
                                      self._neutral,
                                      99, size=(size[0],gateHeight)))
 
+
         if connectionType == 0: #Basic barrier wall or edge
             g = Gate((self._position[0],self._position[1]+gateHeight),
                      self._neutral, 99, direction=0, size=(size[0],gateHeight))
             self._components.append(g)
+        elif connectionType == "neutral":
+            pass
         else:
             g = Gate((self._position[0],self._position[1]+gateHeight),
                      color, connectionType, direction=0, size=(size[0],gateHeight))
@@ -48,7 +51,7 @@ class Wall():
 
 class Platform():
 
-    def __init__(self, pos, connectionType, color=(120,120,120),
+    def __init__(self, pos, connectionType, color=None,
                  size=(10,120)):
         # Save the position of the wall component
         self._position = pos
@@ -71,6 +74,8 @@ class Platform():
             g = Gate((self._position[0]+gateWidth,self._position[1]),
                      self._neutral, 99, direction=1, size=(size[0],gateWidth))
             self._components.append(g)
+        elif connectionType == "neutral":
+            pass
         else:
             g = Gate((self._position[0]+gateWidth,self._position[1]),
                      color, connectionType, direction=1, size=(size[0],gateWidth))
