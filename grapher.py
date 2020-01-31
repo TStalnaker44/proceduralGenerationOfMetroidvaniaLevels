@@ -10,13 +10,15 @@ def tester():
     plot(g)
 
     # Create a branching graph
-    ordering = {"red":["green","blue","purple"],"green":"orange",
-                "blue":"black","black":["pink","yellow","brown"],
-                "brown":"white"}
+##    ordering = {"red":["green","blue","purple"],"green":"orange",
+##                "blue":"black","black":["pink","yellow","brown"],
+##                "brown":"white"}
+    ordering = {"neutral":"grey","grey":["red","orange"],"red":"green","green":"blue",
+               "orange":["yellow","white"],"yellow":"purple"}
     g = createGraph(ordering)
     plot(g)
 
-    #print([x for x in nx.topological_sort(g)])
+    print([x for x in nx.topological_sort(g)])
 
     
 def plot(g):

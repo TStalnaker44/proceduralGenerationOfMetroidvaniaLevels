@@ -54,7 +54,7 @@ class LevelTester():
       self._gates = grapher.getGateOrder(ordering)
       self._keys = {gate:startNode for gate in self._gates} #This provides default start for keys  
       self._g = latticeCreator.generateViableMap(dimensions, self._gates, self._keys,
-                                                 .5, endNode, startNode)
+                                                 0.5, endNode, startNode)
 
    def loadMap(self, fileName):
       """Load a map saved to file"""
@@ -74,9 +74,6 @@ class LevelTester():
          self._startNode = 1
 
       self._SCREEN_SIZE = (self._n*100,self._m*100)
-
-      self._SCREEN_SIZE = (self._n*100,self._m*100)
-
       self.prepareMap()
       self._won = False
 
@@ -96,6 +93,7 @@ class LevelTester():
    def prepareMap(self):
       """Prepare the graphical / displayed components of the level"""
 
+      # Initialize visual attributes
       self._walls = []
       self._platforms = []
       self._physicalKeys = []
@@ -195,6 +193,7 @@ class LevelTester():
                   ((topCorners[self._startNode-1][1]*roomSize[1])+(roomSize[1]//2))+startCoord[1])
       self._player = Avatar(startPos)
 
+      # Separate the platforms and walls into their components (for collision detection)
       self._platformParts = []
       for p in self._platforms:
          self._platformParts.extend(p.getComponents())
@@ -202,6 +201,7 @@ class LevelTester():
       for w in self._walls:
          self._wallParts.extend(w.getComponents())
 
+      # Create the finishing block
       s = pygame.Surface((roomSize[0]//2, roomSize[1]//2))
       s.fill((212, 175, 55))
       topCorner = topCorners[self._endNode-1]
@@ -214,17 +214,22 @@ class LevelTester():
    def draw(self, screen):
       """Draw the level to the screen"""
 
+      # Draw the finishing block to the screen
       self._finish.draw(screen)
-      
+
+      # Draw the vertical walls to the screen
       for gate in self._walls:
          gate.draw(screen)
 
+      # Draw the horizontal platforms to the screen
       for gate in self._platforms:
          gate.draw(screen)
 
+      # Draw the keys to the screen
       for key in self._physicalKeys:
          key.draw(screen)
 
+      # Draw the player to the screen
       self._player.draw(screen)
 
       # Draw the players collected keys to the screen
@@ -242,30 +247,36 @@ class LevelTester():
    def handleEvent(self, event):
       """Handle events for the level"""
 
+      # Handle the player's events based on the win condition
       if not self._won:
          self._player.move(event)
       else:
          for k in self._player._movement.keys(): self._player._movement[k] = False
 
-      if event.type == pygame.KEYDOWN:   
+      if event.type == pygame.KEYDOWN:
+         # Plot the current mapping using networkx and matplotlib
          if event.key == pygame.K_p:
             self.plot()
+         # Save the current map when s is pressed
          elif event.key == pygame.K_s:
             sfile = input("Name the file to be saved: ")
             self.saveMap("maps\\" + sfile + ".mapdat")
+         # Load in a saved map when l is pressed
          elif event.key == pygame.K_l:
             print("Files:", [x[5:][:-7] for x in glob.glob("maps/*")])
             lfile = input("File to load: ")
             self.loadMap("maps\\" + lfile + ".mapdat")
+         # Generate a new map when n is pressed
          elif event.key == pygame.K_n:
             self.newMap()
 
    def update(self, worldsize, ticks):
       """Update the level state and display"""
 
-      #Update the offset based on the stars location
+      # Update the offset based on the stars location
       self._player.updateOffset(self._player, self._SCREEN_SIZE, self._WORLD_SIZE)
 
+      # Update the player object (prevents player from phasing through walls)
       self._player.update(worldsize, ticks, self._platformParts, self._wallParts)
       
       # Allow the avatar to collect keys
@@ -277,6 +288,7 @@ class LevelTester():
       # Remove keys that have been collected
       self._physicalKeys = [key for key in self._physicalKeys if not key.collected()]
 
+      # End the game when the player reaches the end node
       if self._player.getCollideRect().colliderect(self._finish.getCollideRect()):
          self._won = True
 
@@ -312,7 +324,7 @@ def main():
    font = pygame.font.SysFont("Times New Roman", 32)
 
    #Update the title for the window
-   pygame.display.set_caption('Level Tester')
+   pygame.display.set_caption('Maze Game')
    
    #Get the screen
    screen = pygame.display.set_mode(SCREEN_SIZE)
@@ -328,7 +340,7 @@ def main():
    
    endNode   = random.randint(1,n*m)
    startNode = random.randint(1,n*m)
-   assert n*m > 3*len(ordering)
+   assert n*m > 3*len(ordering) # A reasonable assumption that will hopefully prevent an infinite loop
    assert 0 < endNode <= n*m
    assert 0 < startNode <= n*m
    assert startNode != endNode
