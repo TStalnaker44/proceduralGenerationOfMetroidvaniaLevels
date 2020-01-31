@@ -5,7 +5,7 @@ from graphics.mysurface import MySurface
 
 class Wall():
 
-    def __init__(self, pos, connectionType, color=(120,120,120),
+    def __init__(self, pos, connectionType, color=None,
                  size=(10,120)):
         # Save the position of the wall component
         self._position = pos

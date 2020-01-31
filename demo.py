@@ -15,8 +15,8 @@ import matplotlib.pyplot as plt
 import grapher, latticeCreator
 from graphics import MySurface
 
-n = 15 #6
-m = 10 #4
+n = 6
+m = 4
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (800,500)
@@ -120,18 +120,19 @@ class LevelTester():
 
       # Add connections between rooms
       for edge in self._g.edges(data=True):
-         gateType = self._colors[edge[2]["object"]]
+         gateType = edge[2]["object"]
+         gateColor = self._colors.get(edge[2]["object"], None)
          r = edge[0]
          if edge[1] == r+1:
             r_pos = topCorners[r-1]
             x_pos = ((r_pos[0]+1) * roomSize[0]) + startCoord[0]
             y_pos = (r_pos[1] * roomSize[1]) + startCoord[1]
-            self._walls.append(Wall((x_pos, y_pos), gateType, gateType, size=barrierSize))
+            self._walls.append(Wall((x_pos, y_pos), gateType, gateColor, size=barrierSize))
          elif edge[1] == r+n:
             r_pos = topCorners[r-1]
             x_pos = (r_pos[0] * roomSize[0]) + startCoord[0]
             y_pos = ((r_pos[1]+1) * roomSize[1]) + startCoord[1]
-            self._platforms.append(Platform((x_pos, y_pos), gateType, gateType, size=barrierSize))
+            self._platforms.append(Platform((x_pos, y_pos), gateType, gateColor, size=barrierSize))
 
       #Iterate through the rooms to add the edge walls
       for r in rooms:
@@ -182,10 +183,12 @@ class LevelTester():
          
       # Add Keys to the Rooms
       for key in self._keys.keys():
+         keyType = key
+         keyColor = self._colors.get(keyType, None)
          rCoord = topCorners[self._keys[key]-1]
          midCoord = (((rCoord[0]*roomSize[0]) + roomSize[0]//2)+startCoord[0],
                      ((rCoord[1]*roomSize[1]) + roomSize[1]//2)+startCoord[1])
-         self._physicalKeys.append(Key(midCoord, self._colors[key], self._colors[key]))
+         self._physicalKeys.append(Key(midCoord, keyColor, keyType))
 
       # Create a player object
       startPos = (((topCorners[self._startNode-1][0]*roomSize[0])+(roomSize[0]//2))+startCoord[0],
@@ -227,7 +230,8 @@ class LevelTester():
       # Draw the players collected keys to the screen
       r = 10 # Radius of orbs
       for i, orb in enumerate(self._player.getKeys()):
-         pygame.draw.circle(screen, orb, ((i+1) * int(2.5 * r) ,self._SCREEN_SIZE[1]-25), r)
+         color = self._colors.get(orb, None)
+         pygame.draw.circle(screen, color, ((i+1) * int(2.5 * r) ,self._SCREEN_SIZE[1]-25), r)
 
       # If the game has been won, display winning message to the screen
       if self._won:

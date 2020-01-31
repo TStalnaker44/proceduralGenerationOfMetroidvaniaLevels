@@ -14,6 +14,7 @@ class Key(Drawable):
         self._height = 15
         self._image = pygame.Surface((self._width, self._height))
         self._image.fill(color)
+        self._color = color
 
         self._collected = False
         self._type = keyType
@@ -26,5 +27,8 @@ class Key(Drawable):
 
     def getType(self):
         return self._type
+
+    def getColor(self):
+        return self._color
 
 
