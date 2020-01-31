@@ -1,6 +1,6 @@
 class MapData():
 
-    def __init__(self, g, keys, gates, m, n, endNode, ordering, startNode):
+    def __init__(self, g, keys, gates, m, n, endNode, ordering, startNode, weightedNeutral):
         self._g = g
         self._keys = keys
         self._gates = gates
@@ -9,3 +9,4 @@ class MapData():
         self._endNode = endNode
         self._ordering = ordering
         self._startNode = startNode
+        self._weightedNeutral = weightedNeutral
