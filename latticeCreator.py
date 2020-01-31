@@ -152,11 +152,20 @@ def viableMap(dimensions, gates, weightedNeutral=0, endNode=None, startNode=1):
         if len(findExplorable(g, gates[:x], startNode)) == \
            len(findExplorable(g, gates[:x+1], startNode)):
             return False
+
+    # Double check that key allows new unexplored areas to be reached
+    for x in range(0, len(gates)-1):
+        previouslyExplorable = set(findExplorable(g, gates[:x], startNode))
+        nowExplorable = set(findExplorable(g, gates[:x+1], startNode))
+        newAreas = list(nowExplorable - previouslyExplorable)
+        if len(newAreas) == 0: return False
         
-    # Find all the red edges
-    primary_edges = ([e for e in g.edges(data=True) if e[2]['object']==gates[0]]
-                     )
-    # Determine if a red edge connects the first node to another
+
+        
+    # Find all the primary edges
+    primary_edges = ([e for e in g.edges(data=True) if e[2]['object']==gates[0]])
+    
+    # Determine if a primary edge connects the first node to another
     for e in primary_edges:
         if e[0] == 1:
             return g
@@ -177,6 +186,7 @@ def placeKeys(g, gates, keys, startNode):
         previouslyExplorable = set(findExplorable(g, gates[:x], startNode))
         nowExplorable = set(findExplorable(g, gates[:x+1], startNode))
         newAreas = list(nowExplorable - previouslyExplorable)
+        print("New Areas", newAreas)
         keyLocation = random.choice(newAreas)
         keys[gates[x+1]] = keyLocation
 

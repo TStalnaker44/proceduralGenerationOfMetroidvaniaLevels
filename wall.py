@@ -1,5 +1,5 @@
 
-import pygame
+import pygame, random
 from gate import Gate
 from graphics.mysurface import MySurface
 
@@ -19,11 +19,12 @@ class Wall():
 
         gateHeight = size[1] // 3
 
-        self._components.append(Gate(self._position, self._neutral,
-                                     99, size=(size[0],gateHeight)))
-        self._components.append(Gate((self._position[0],self._position[1]+(2*gateHeight)),
-                                     self._neutral,
-                                     99, size=(size[0],gateHeight)))
+        if connectionType != "neutral" or random.random() < .5:
+            self._components.append(Gate(self._position, self._neutral,
+                                         99, size=(size[0],gateHeight)))
+            self._components.append(Gate((self._position[0],self._position[1]+(2*gateHeight)),
+                                         self._neutral,
+                                         99, size=(size[0],gateHeight)))
 
 
         if connectionType == 0: #Basic barrier wall or edge
