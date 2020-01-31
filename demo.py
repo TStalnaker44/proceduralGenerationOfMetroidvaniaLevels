@@ -3,7 +3,7 @@ Author: Trevor Stalnaker
 File: test_demo.py
 """
 
-import pygame, pickle, glob
+import pygame, pickle, glob, random
 from mapdata import MapData
 from key import Key
 from gate import Gate
@@ -15,8 +15,8 @@ import matplotlib.pyplot as plt
 import grapher, latticeCreator
 from graphics import MySurface
 
-n = 6
-m = 4
+n = random.randint(4,10)#6
+m = random.randint(4,10)#4
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (800,500)
@@ -286,7 +286,7 @@ class LevelTester():
       color_map = []
       for node in self._g:
           for gate in self._gates:
-              if self._keys[gate] == node:
+              if self._keys[gate] == node and gate in self._colors.keys():
                   color_map.append(gate)
                   break
           else:
@@ -322,12 +322,13 @@ def main():
    avatar = Avatar((100,100))
 
    level = LevelTester(SCREEN_SIZE, WORLD_SIZE)
-   ordering = {"neutral":"red","red":"green","green":"blue","blue":"white",}
-   #ordering = {"grey":["red","orange"],"red":"green","green":"blue",
-   #            "orange":["yellow","white"],"yellow":"purple"}
+   #ordering = {"neutral":"red","red":"green","green":"blue","blue":"white",}
+   ordering = {"neutral":"grey","grey":["red","orange"],"red":"green","green":"blue",
+               "orange":["yellow","white"],"yellow":"purple"}
    
-   endNode   = 5#n*m
-   startNode = 3
+   endNode   = random.randint(1,n*m)
+   startNode = random.randint(1,n*m)
+   assert n*m > 3*len(ordering)
    assert 0 < endNode <= n*m
    assert 0 < startNode <= n*m
    assert startNode != endNode
@@ -366,17 +367,6 @@ def main():
       ticks = gameClock.get_time() / 1000
       
       level.update(WORLD_SIZE, ticks)
-      #avatar.update(WORLD_SIZE, ticks, platforms, walls)
-
-      # Allow the avatar to collect keys
-##      for key in keys:
-##        if key.getCollideRect().colliderect(avatar.getCollideRect()):
-##            avatar.giveKey(key.getType())
-##            key.collect()
-##            print(avatar._keys)
-
-      # Remove keys that have been collected
-      #keys = [key for key in keys if not key.collected()]
 
    #Close the pygame window and quit pygame
    pygame.quit()

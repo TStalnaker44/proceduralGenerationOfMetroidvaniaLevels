@@ -186,7 +186,6 @@ def placeKeys(g, gates, keys, startNode):
         previouslyExplorable = set(findExplorable(g, gates[:x], startNode))
         nowExplorable = set(findExplorable(g, gates[:x+1], startNode))
         newAreas = list(nowExplorable - previouslyExplorable)
-        print("New Areas", newAreas)
         keyLocation = random.choice(newAreas)
         keys[gates[x+1]] = keyLocation
 
