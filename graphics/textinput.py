@@ -109,6 +109,7 @@ class TextInput(Drawable):
     def setText(self, text):
         """Set the text displayed in the input bar"""
         self._textbox.setText(text)
+        self.__updateInput()
 
     def __updateInput(self):
         """Update the widget's display"""

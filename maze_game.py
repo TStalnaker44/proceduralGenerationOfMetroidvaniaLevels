@@ -14,6 +14,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import grapher, latticeCreator
 from graphics import MySurface
+from loadmenu import LoadMenu
 
 n = 5#random.randint(4,10)#6
 m = 6#random.randint(4,10)#4
@@ -260,18 +261,10 @@ class LevelTester():
          for k in self._player._movement.keys(): self._player._movement[k] = False
 
       if event.type == pygame.KEYDOWN:
-         # Plot the current mapping using networkx and matplotlib
-         if event.key == pygame.K_p:
-            self.plot()
          # Save the current map when s is pressed
-         elif event.key == pygame.K_s:
+         if event.key == pygame.K_s:
             sfile = input("Name the file to be saved: ")
             self.saveMap("maps\\" + sfile + ".mapdat")
-         # Load in a saved map when l is pressed
-         elif event.key == pygame.K_l:
-            print("Files:", [x[5:][:-7] for x in glob.glob("maps/*")])
-            lfile = input("File to load: ")
-            self.loadMap("maps\\" + lfile + ".mapdat")
          # Generate a new map when n is pressed
          elif event.key == pygame.K_n:
             self.newMap()
@@ -344,14 +337,18 @@ def main():
    ordering = {"neutral":"grey","grey":["red","orange"],"red":"green","green":"blue",
                "orange":["yellow","white"],"yellow":"purple"}
    
-   endNode   = random.randint(1,n*m)
-   startNode = random.randint(1,n*m)
+   endNode   = n*m#random.randint(1,n*m)
+   startNode = 1#random.randint(1,n*m)
    assert n*m > 3*len(ordering) # A reasonable assumption that will hopefully prevent an infinite loop
    assert 0 < endNode <= n*m
    assert 0 < startNode <= n*m
    assert startNode != endNode
    level.makeMap(m,n,ordering,endNode,startNode,.5)
    level.prepareMap()
+
+   loadmenu = LoadMenu((SCREEN_SIZE[0]//2 - 250,SCREEN_SIZE[1]//2-150),
+                       (500,300))
+   loadmenu.close()
 
 
    RUNNING = True
@@ -365,6 +362,9 @@ def main():
       screen.fill((140,50,20))
 
       level.draw(screen)
+
+      if loadmenu.getDisplay():
+         loadmenu.draw(screen)
       
       pygame.display.flip()
 
@@ -377,9 +377,22 @@ def main():
             
             # change the value to False, to exit the main loop
             RUNNING = False
+ 
+         if event.type==pygame.KEYDOWN:
+            # Load in a saved map when o is pressed
+            if event.key == pygame.K_o and \
+               event.mod & pygame.KMOD_CTRL:
+               loadmenu.display()
+            # Plot the current mapping using networkx and matplotlib
+            if event.key == pygame.K_p and \
+               event.mod & pygame.KMOD_CTRL:
+               level.plot()
 
-         #avatar.move(event)
          level.handleEvent(event)
+
+         sel = loadmenu.handleEvent(event)
+         if sel != None:
+            level.loadMap("maps\\" + sel + ".mapdat")
 
       #Calculate ticks
       ticks = gameClock.get_time() / 1000
