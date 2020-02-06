@@ -178,7 +178,8 @@ class Platform():
                     self._neutral,
                     99,
                     direction=1,
-                    size=(size[0],length)))
+                    size=(size[0],length),
+                    passUp=True))
             
             
     def draw(self, screen):

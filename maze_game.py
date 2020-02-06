@@ -108,8 +108,8 @@ class LevelTester():
       self._walls = []
       self._platforms = []
       self._physicalKeys = []
-      roomHeight = 5 * u # 4 standard units
-      roomWidth = 12 * u # 10 standard units
+      roomHeight = 4 * u # 4 standard units
+      roomWidth = 10 * u # 10 standard units
       roomSize = (roomWidth, roomHeight)
       barrierWidth = (1/4) * u
       wallSize = (barrierWidth, roomHeight + barrierWidth)

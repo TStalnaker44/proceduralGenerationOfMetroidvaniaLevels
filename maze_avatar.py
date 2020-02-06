@@ -102,7 +102,8 @@ class Avatar(Drawable):
                             self._jumpTimer = 0 # Reset the jump timer
 
                     # Check that the player is jumping
-                    elif self._velocity.y < 0:
+                    elif self._velocity.y < 0 and not other._passUp:
+                        print(other._passUp)
                         # Check that the player is above the platform
                         if self.getY() + (self.getHeight()//2)  > other.getY(): 
                             #Put the player on the platform
