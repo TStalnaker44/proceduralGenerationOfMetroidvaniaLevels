@@ -210,7 +210,8 @@ class LevelTester():
             self._physicalKeys.append(Key(midCoord, keyColor, keyType))
 
       # Create a player object
-      startPos = (((topCorners[self._startNode-1][0]*roomSize[0])+(roomSize[0]//2))+startCoord[0],
+      
+      startPos = (startCoord[0] + u,
                   ((topCorners[self._startNode-1][1]*roomSize[1])+(roomSize[1]//2))+startCoord[1])
       self._player = Avatar(startPos)
 
@@ -342,8 +343,6 @@ def main():
    #Get the screen
    screen = pygame.display.set_mode(SCREEN_SIZE)
 
-   gameClock = pygame.time.Clock()
-
    avatar = Avatar((100,100))
 
    level = LevelTester(SCREEN_SIZE, WORLD_SIZE)
@@ -364,6 +363,9 @@ def main():
                        (500,300))
    loadmenu.close()
 
+   # Create the game clock after all of the preprocessing is done
+   # This prevents initial lag from effecting the beginning of the game
+   gameClock = pygame.time.Clock()
 
    RUNNING = True
 
