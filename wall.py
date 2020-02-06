@@ -124,13 +124,8 @@ class Platform():
 
         self._neutral = (120,120,120)
 
-        gateWidth = standardUnit#size[1] // 3
+        gateWidth = standardUnit
 
-##        self._components.append(Gate(self._position, self._neutral,
-##                                     99, direction=1, size=(size[0],gateWidth)))
-##        self._components.append(Gate((self._position[0]+(2*gateWidth),self._position[1]),
-##                                     self._neutral,
-##                                     99, direction=1, size=(size[0],gateWidth)))
         # Create a barrier (exterior) platform
         if connectionType == 0:
             g = Gate(self._position,
@@ -140,9 +135,10 @@ class Platform():
         else:
 
             leftEdgeLength = (size[1]-gateWidth) // 2
-            #leftEdgeLength = 3.5 * standardUnit
             rightEdgeLength = (size[1] - leftEdgeLength) - gateWidth
             midplatformLength = 3 * standardUnit
+            midplatformXPos = self._position[0] + ((size[1] // 2) - (midplatformLength // 2))
+                              
             upperplatformLength = standardUnit
 
             # Create the gating surface
@@ -171,18 +167,17 @@ class Platform():
                 99,
                 direction=1,
                 size=(size[0],rightEdgeLength)))
-            
 
+            # Create the middle platforms
+            for x in range(1, int(size[1]//standardUnit)+1):
+                self._components.append(Gate(
+                    ((midplatformXPos, self._position[1]+(x*standardUnit))),
+                    self._neutral,
+                    99,
+                    direction=1,
+                    size=(size[0],midplatformLength)))
             
             
-##            
-##        elif connectionType == "neutral":
-##            pass
-##        else:
-##            g = Gate((self._position[0]+gateWidth,self._position[1]),
-##                     color, connectionType, direction=1, size=(size[0],gateWidth))
-##            self._components.append(g)
-
     def draw(self, screen):
         for component in self._components:
             component.draw(screen)
