@@ -82,10 +82,11 @@ class Avatar(Drawable):
 
         self._position += (self._velocity * ticks)
         
-        for other in platforms:
+        for other in platforms + walls:
 
             # Check if the type of collidable is a gate
-            if type(other) == Gate:
+            # and if it is a platform (direction is 1)
+            if type(other) == Gate and other._direction==1:
 
                 # Check if the player can pass through a given platform
                 if not other.getType() in self._keys and \

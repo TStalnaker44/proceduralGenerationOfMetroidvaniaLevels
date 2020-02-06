@@ -136,7 +136,7 @@ class LevelTester():
             r_pos = topCorners[r-1]
             x_pos = ((r_pos[0]+1) * roomSize[0]) + startCoord[0]
             y_pos = (r_pos[1] * roomSize[1]) + startCoord[1]
-            self._walls.append(Wall((x_pos, y_pos), gateType, gateColor, size=barrierSize))
+            self._walls.append(Wall((x_pos, y_pos), gateType, gateColor, size=barrierSize, standardUnit=u))
          elif edge[1] == r+self._n:
             r_pos = topCorners[r-1]
             x_pos = (r_pos[0] * roomSize[0]) + startCoord[0]
@@ -172,23 +172,23 @@ class LevelTester():
          if r % self._n == 1:
             x_pos = (topCorners[r-1][0]*roomSize[0]) + startCoord[0]
             y_pos = ((topCorners[r-1][1])*roomSize[1]) + startCoord[1]
-            self._walls.append(Wall((x_pos, y_pos), 0, size=barrierSize))
+            self._walls.append(Wall((x_pos, y_pos), 0, size=barrierSize, standardUnit=u))
          elif not (r-1, r) in self._g.edges():
             r_pos = topCorners[r-2]
             x_pos = ((r_pos[0]+1) * roomSize[0]) + startCoord[0]
             y_pos = (r_pos[1] * roomSize[1]) + startCoord[1]
-            self._walls.append(Wall((x_pos, y_pos), 0, size=barrierSize))
+            self._walls.append(Wall((x_pos, y_pos), 0, size=barrierSize, standardUnit=u))
             
          #Add barriers to the rights of rooms
          if r % self._n == 0:
             x_pos = ((topCorners[r-1][0]+1)*roomSize[0]) + startCoord[0]
             y_pos = ((topCorners[r-1][1])*roomSize[1]) + startCoord[1]
-            self._walls.append(Wall((x_pos, y_pos), 0, size=barrierSize))
+            self._walls.append(Wall((x_pos, y_pos), 0, size=barrierSize, standardUnit=u))
          elif not (r, r+1) in self._g.edges():
             r_pos = topCorners[r-1]
             x_pos = ((r_pos[0]+1) * roomSize[0]) + startCoord[0]
             y_pos = (r_pos[1] * roomSize[1]) + startCoord[1]
-            self._walls.append(Wall((x_pos, y_pos), 0, size=barrierSize))
+            self._walls.append(Wall((x_pos, y_pos), 0, size=barrierSize, standardUnit=u))
          
       # Add Keys to the Rooms
       for key in self._keys.keys():
