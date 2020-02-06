@@ -108,12 +108,10 @@ class LevelTester():
       self._walls = []
       self._platforms = []
       self._physicalKeys = []
-      #roomDim = 4 * u # 4 standard units
       roomHeight = 4 * u # 4 standard units
-      roomWidth = 8 * u # 8 standard units
+      roomWidth = 10 * u # 10 standard units
       roomSize = (roomWidth, roomHeight)
       barrierWidth = (1/4) * u
-      #barrierSize = (barrierWidth,roomDim+barrierWidth)
       wallSize = (barrierWidth, roomHeight + barrierWidth)
       platformSize = (barrierWidth, roomWidth + barrierWidth) 
       startCoord = (100,100)
@@ -145,7 +143,7 @@ class LevelTester():
             r_pos = topCorners[r-1]
             x_pos = (r_pos[0] * roomSize[0]) + startCoord[0]
             y_pos = ((r_pos[1]+1) * roomSize[1]) + startCoord[1]
-            self._platforms.append(Platform((x_pos, y_pos), gateType, gateColor, size=platformSize))
+            self._platforms.append(Platform((x_pos, y_pos), gateType, gateColor, size=platformSize, standardUnit=u))
 
       #Iterate through the rooms to add the edge walls
       for r in rooms:
@@ -154,23 +152,23 @@ class LevelTester():
          if r <= self._n:
             x_pos = (topCorners[r-1][0]*roomSize[0]) + startCoord[0]
             y_pos = (topCorners[r-1][1]*roomSize[1]) + startCoord[1]
-            self._platforms.append(Platform((x_pos, y_pos), 0, size=platformSize))
+            self._platforms.append(Platform((x_pos, y_pos), 0, size=platformSize, standardUnit=u))
          elif not (r-self._n, r) in self._g.edges:
             r_pos = topCorners[(r-self._n)-1]
             x_pos = (r_pos[0] * roomSize[0]) + startCoord[0]
             y_pos = ((r_pos[1]+1) * roomSize[1]) + startCoord[1]
-            self._platforms.append(Platform((x_pos, y_pos), 0, size=platformSize))
+            self._platforms.append(Platform((x_pos, y_pos), 0, size=platformSize, standardUnit=u))
             
          #Add barriers to the bottoms of rooms
          if r > ((self._m-1)*self._n):
             x_pos = (topCorners[r-1][0]*roomSize[0]) + startCoord[0]
             y_pos = ((topCorners[r-1][1]+1)*roomSize[1]) + startCoord[1]
-            self._platforms.append(Platform((x_pos, y_pos), 0, size=platformSize))
+            self._platforms.append(Platform((x_pos, y_pos), 0, size=platformSize, standardUnit=u))
          elif not (r, r+self._n) in self._g.edges:
             r_pos = topCorners[r-1]
             x_pos = (r_pos[0] * roomSize[0]) + startCoord[0]
             y_pos = ((r_pos[1]+1) * roomSize[1]) + startCoord[1]
-            self._platforms.append(Platform((x_pos, y_pos), 0, size=platformSize))
+            self._platforms.append(Platform((x_pos, y_pos), 0, size=platformSize, standardUnit=u))
             
          #Add barriers to the lefts of rooms
          if r % self._n == 1:

@@ -98,26 +98,7 @@ class Wall():
                                              99,
                                              direction=1, #Set to have a horizontal direction
                                              size=(size[0],platformWidth)))
-                
-                
-
-            
-##            if connectionType != "neutral":
-##                g = Gate((self._position[0],self._position[1]+(size[1]-(gateHeight + size[0]))),
-##                     color, connectionType, direction=0, size=(size[0],gateHeight))
-##                self._components.append(g)
-##                self._components.append(Gate((self._position[0],self._position[1]+(size[1]-size[0])),
-##                                              self._neutral, 99, size=(size[0],size[0])))
-##        elif connectionType == "neutral":
-##            if random.random() < 0.5:
-##                self._components.append(Gate(self._position, self._neutral,
-##                                         99, size=(size[0],gateHeight)))
-##                self._components.append(Gate((self._position[0],self._position[1]+(2*gateHeight)),
-##                                         self._neutral,
-##                                         99, size=(size[0],gateHeight)))
-##        else:
-            
-
+                           
     def draw(self, screen):
         for component in self._components:
             component.draw(screen)
@@ -133,7 +114,7 @@ class Wall():
 class Platform():
 
     def __init__(self, pos, connectionType, color=None,
-                 size=(10,120)):
+                 size=(10,120), standardUnit=None):
         # Save the position of the wall component
         self._position = pos
         # Save the connection type of the wall component
@@ -143,24 +124,64 @@ class Platform():
 
         self._neutral = (120,120,120)
 
-        gateWidth = size[1] // 3
+        gateWidth = standardUnit#size[1] // 3
 
-        self._components.append(Gate(self._position, self._neutral,
-                                     99, direction=1, size=(size[0],gateWidth)))
-        self._components.append(Gate((self._position[0]+(2*gateWidth),self._position[1]),
-                                     self._neutral,
-                                     99, direction=1, size=(size[0],gateWidth)))
-
-        if connectionType == 0: #Basic barrier wall or edge
-            g = Gate((self._position[0]+gateWidth,self._position[1]),
-                     self._neutral, 99, direction=1, size=(size[0],gateWidth))
+##        self._components.append(Gate(self._position, self._neutral,
+##                                     99, direction=1, size=(size[0],gateWidth)))
+##        self._components.append(Gate((self._position[0]+(2*gateWidth),self._position[1]),
+##                                     self._neutral,
+##                                     99, direction=1, size=(size[0],gateWidth)))
+        # Create a barrier (exterior) platform
+        if connectionType == 0:
+            g = Gate(self._position,
+                     self._neutral, 99, direction=1, size=(size[0],size[1]))
             self._components.append(g)
-        elif connectionType == "neutral":
-            pass
+
         else:
-            g = Gate((self._position[0]+gateWidth,self._position[1]),
-                     color, connectionType, direction=1, size=(size[0],gateWidth))
-            self._components.append(g)
+
+            leftEdgeLength = (size[1]-gateWidth) // 2
+            #leftEdgeLength = 3.5 * standardUnit
+            rightEdgeLength = (size[1] - leftEdgeLength) - gateWidth
+            midplatformLength = 3 * standardUnit
+            upperplatformLength = standardUnit
+
+            # Create the gating surface
+            
+            # Create the left subpart
+            self._components.append(Gate(
+                self._position,
+                self._neutral,
+                99,
+                direction=1,
+                size=(size[0],leftEdgeLength)))
+
+            if connectionType != "neutral": 
+                # Create the gated opening
+                self._components.append(Gate(
+                    (self._position[0]+leftEdgeLength,self._position[1]),
+                    color,
+                    connectionType,
+                    direction=1,
+                    size=(size[0],gateWidth)))            
+
+            # Create the right subpart
+            self._components.append(Gate(
+                (self._position[0]+leftEdgeLength+gateWidth,self._position[1]),
+                self._neutral,
+                99,
+                direction=1,
+                size=(size[0],rightEdgeLength)))
+            
+
+            
+            
+##            
+##        elif connectionType == "neutral":
+##            pass
+##        else:
+##            g = Gate((self._position[0]+gateWidth,self._position[1]),
+##                     color, connectionType, direction=1, size=(size[0],gateWidth))
+##            self._components.append(g)
 
     def draw(self, screen):
         for component in self._components:
