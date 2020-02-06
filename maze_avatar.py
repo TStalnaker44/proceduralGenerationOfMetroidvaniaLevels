@@ -6,6 +6,7 @@ File: maze_avatar.py
 from modules.drawable import Drawable
 from modules.vector2D import Vector2
 from gate import Gate
+from fsm import *
 import pygame
 
 class Avatar(Drawable):
@@ -28,6 +29,19 @@ class Avatar(Drawable):
 
         self._keys = []
 
+        states = ["standing","jumping","falling","walking"]
+        transitions = [Rule("standing","jump","jumping"),
+                       Rule("jumping","fall","falling"),
+                       Rule("falling","stop","standing"),
+                       Rule("standing","walk","walking"),
+                       Rule("walking","stop","standing"),
+                       Rule("walking","jump","jumping"),
+                       Rule("walking","fall","falling"),
+                       Rule("standing","fall","falling")]
+        self._fsm = FSM("standing", states, transitions)
+
+        self._onGround = False
+
         self._jumpTime = 0.5
         self._jumpTimer = 0
 
@@ -45,10 +59,18 @@ class Avatar(Drawable):
         self._keys.append(key)
 
     def move(self, event):
+        
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            if (self._fsm.getCurrentState() == "standing" or \
+               self._fsm.getCurrentState() == "walking") and \
+               self._onGround:
+                self._fsm.changeState("jump")
+                self._onGround = False
+                
         if event.type == pygame.KEYDOWN:
             self._movement[event.key] = True
         elif event.type == pygame.KEYUP:
-            self._movement[event.key] = False            
+            self._movement[event.key] = False
 
     def update(self, worldInfo, ticks, platforms, walls):
         """Updates the position of the star"""
@@ -64,12 +86,31 @@ class Avatar(Drawable):
         else:
             self._velocity.x = 0
 
-        if self._movement[pygame.K_UP]:
-            self._velocity.y = -self._maxVelocity
-        elif self._movement[pygame.K_DOWN]:
-            self._velocity.y = self._maxVelocity
-        else:
-            self._velocity.y = 0
+        if (self._fsm.getCurrentState() == "standing" or \
+           self._fsm.getCurrentState() == "walking") and \
+           not self._onGround:
+            self._fsm.changeState("fall")
+
+        if self._fsm.getCurrentState() == "jumping":
+            if self._jumpTimer > 0:
+                self._velocity.y = -self._maxVelocity
+                self._jumpTimer -= ticks
+            else:
+                self._fsm.changeState("fall")
+                self._jumpTimer = self._jumpTime
+                
+        if self._fsm.getCurrentState() == "falling":
+            if not self._onGround:
+                self._velocity.y = self._maxVelocity
+            else:
+                self._fsm.changeState("stop")
+                
+##        if self._movement[pygame.K_UP]:
+##            self._velocity.y = -self._maxVelocity
+##        elif self._movement[pygame.K_DOWN]:
+##            self._velocity.y = self._maxVelocity
+##        else:
+##            self._velocity.y = 0
 
         #Update the position of the star based on its current velocity and ticks
         newPosition = self._position + (self._velocity * ticks)
@@ -98,12 +139,10 @@ class Avatar(Drawable):
                         if self.getY() + self.getHeight()//2 < other.getY(): 
                             #Put the player on the platform
                             self._position.y = other.getY() - self.getHeight()
-                            self._velocity.y = 0 # Reset the player's velocity
-                            self._jumpTimer = 0 # Reset the jump timer
+                            self._onGround = True
 
                     # Check that the player is jumping
                     elif self._velocity.y < 0 and not other._passUp:
-                        print(other._passUp)
                         # Check that the player is above the platform
                         if self.getY() + (self.getHeight()//2)  > other.getY(): 
                             #Put the player on the platform

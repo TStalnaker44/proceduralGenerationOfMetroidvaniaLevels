@@ -114,7 +114,7 @@ class Wall():
 class Platform():
 
     def __init__(self, pos, connectionType, color=None,
-                 size=(10,120), standardUnit=None):
+                 size=(10,120), standardUnit=None, roomHeight=None):
         # Save the position of the wall component
         self._position = pos
         # Save the connection type of the wall component
@@ -168,9 +168,9 @@ class Platform():
                 size=(size[0],rightEdgeLength)))
 
             # Create the middle platforms
-            for x in range(1, int(size[1]//standardUnit)):
-                length = random.randint(midplatformLength-(size[1]//4),
-                                        midplatformLength+(size[1]//4))
+            for x in range(1, int(roomHeight//standardUnit)):
+                length = random.randint(midplatformLength-(size[1]//8),
+                                        midplatformLength+(size[1]//8))
                 midplatformXPos = self._position[0] + ((size[1] // 2) - (length // 2)) + \
                                   random.randint(-standardUnit,standardUnit)
                 self._components.append(Gate(
