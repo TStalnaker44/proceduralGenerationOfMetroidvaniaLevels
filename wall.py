@@ -137,7 +137,6 @@ class Platform():
             leftEdgeLength = (size[1]-gateWidth) // 2
             rightEdgeLength = (size[1] - leftEdgeLength) - gateWidth
             midplatformLength = 3 * standardUnit
-            midplatformXPos = self._position[0] + ((size[1] // 2) - (midplatformLength // 2))
                               
             upperplatformLength = standardUnit
 
@@ -169,13 +168,17 @@ class Platform():
                 size=(size[0],rightEdgeLength)))
 
             # Create the middle platforms
-            for x in range(1, int(size[1]//standardUnit)+1):
+            for x in range(1, int(size[1]//standardUnit)):
+                length = random.randint(midplatformLength-(size[1]//4),
+                                        midplatformLength+(size[1]//4))
+                midplatformXPos = self._position[0] + ((size[1] // 2) - (length // 2)) + \
+                                  random.randint(-standardUnit,standardUnit)
                 self._components.append(Gate(
                     ((midplatformXPos, self._position[1]+(x*standardUnit))),
                     self._neutral,
                     99,
                     direction=1,
-                    size=(size[0],midplatformLength)))
+                    size=(size[0],length)))
             
             
     def draw(self, screen):
