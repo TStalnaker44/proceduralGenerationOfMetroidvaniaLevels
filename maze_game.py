@@ -100,13 +100,17 @@ class LevelTester():
    def prepareMap(self):
       """Prepare the graphical / displayed components of the level"""
 
+      # Create a standard unit for creation of map
+      u = Avatar((0,0)).getHeight()*1.5
+      print("Standard Unit:", u)
+
       # Initialize visual attributes
       self._walls = []
       self._platforms = []
       self._physicalKeys = []
-      roomDim = 150
+      roomDim = 4 * u # 4 standard units
       roomSize = (roomDim, roomDim)
-      barrierWidth = 10
+      barrierWidth = (1/4) * u
       barrierSize = (barrierWidth,roomDim+barrierWidth)
       startCoord = (100,100)
 
