@@ -30,18 +30,20 @@ class Wall():
                 
             # Create a wall with the gate entrance at ground level
             if variant == 1:
+
                 # Create the top portion of the wall
-                self._components.append(
-                    Gate(self._position, #start at position provided to the wall
-                         self._neutral, #neutral (grey) coloring
-                         99, #key type is 99, ie doesn't exist
-                         # The height of the wall is the height of the total wall minus
-                         # the height of the gate and the width of the map's walls,
-                         # this prevents the gate entrance from being partially embedded
-                         # in the ground
-                         size=(size[0],size[1]-(gateHeight + size[0])) 
-                         )
-                    )
+                if connectionType != "neutral" or random.random() > .5:
+                    self._components.append(
+                        Gate(self._position, #start at position provided to the wall
+                             self._neutral, #neutral (grey) coloring
+                             99, #key type is 99, ie doesn't exist
+                             # The height of the wall is the height of the total wall minus
+                             # the height of the gate and the width of the map's walls,
+                             # this prevents the gate entrance from being partially embedded
+                             # in the ground
+                             size=(size[0],size[1]-(gateHeight + size[0])) 
+                             )
+                        )
                 
                 # Add the game component unless there is a neutral connection
                 if connectionType != "neutral":
@@ -69,11 +71,12 @@ class Wall():
                                self._position[1]+topHeight+gateHeight)
 
                 # Create the top wall component
-                self._components.append(Gate(self._position,
-                                             self._neutral,
-                                             99,
-                                             size=(size[0],topHeight)
-                                             ))
+                if connectionType != "neutral" or random.random() > .5:
+                    self._components.append(Gate(self._position,
+                                                 self._neutral,
+                                                 99,
+                                                 size=(size[0],topHeight)
+                                                 ))
 
                 # Add the gate component unless there's a neutral connection
                 if connectionType != "neutral":
@@ -110,6 +113,13 @@ class Wall():
         for component in self._components:
             component.update(worldsize, ticks)
 
+    def makePickleSafe(self):
+        for component in self._components:
+            component.makePickleSafe()
+
+    def undoPickleSafe(self):
+        for component in self._components:
+            component.undoPickleSafe()
 
 class Platform():
 
@@ -192,4 +202,12 @@ class Platform():
     def update(self, worldsize, ticks):
         for component in self._components:
             component.update(worldsize, ticks)
+
+    def makePickleSafe(self):
+        for component in self._components:
+            component.makePickleSafe()
+
+    def undoPickleSafe(self):
+        for component in self._components:
+            component.undoPickleSafe()
 

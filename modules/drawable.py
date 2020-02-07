@@ -145,3 +145,14 @@ class Drawable():
         """Determines if drawable should be fixed or world bound"""
         self._worldBound = boolean
 
+    def makePickleSafe(self):
+        self._width  = self.getWidth()
+        self._height = self.getHeight()
+        self._image = pygame.image.tostring(self._image, "RGBA")
+
+    def undoPickleSafe(self):
+        self._image = pygame.image.fromstring(self._image,
+                                              (self._width, self._height),
+                                              "RGBA")
+        
+

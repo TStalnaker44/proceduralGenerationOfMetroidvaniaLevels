@@ -39,7 +39,7 @@ class LoadMenu(Drawable, Window):
                                     self._font, (0,0,0), (120,120,150),
                                     buttonHeight, buttonWidth//2, (0,0,0), 2)
 
-        self._options = [{"text":x[5:][:-7],"func":self.updateSelection,"args":x[5:][:-7]} for x in glob.glob("maps/*")]
+        self._options = [{"text":x[10:][:-7],"func":self.updateSelection,"args":x[10:][:-7]} for x in glob.glob("templates/*")]
         self._levelSelect = ScrollSelector((pos[0]+3+buttonXpos,pos[1]+10),(buttonWidth,buttonHeight*2.5),
                                            30,self._options,(0,0,0))
 

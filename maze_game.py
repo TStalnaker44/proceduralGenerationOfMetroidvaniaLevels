@@ -4,7 +4,7 @@ File: maze_game.py
 """
 
 import pygame, pickle, glob, random
-from mapdata import MapData
+from mapdata import MapData, GeneratedMap
 from key import Key
 from gate import Gate
 from maze_avatar import Avatar
@@ -59,8 +59,8 @@ class LevelTester():
       self._g = latticeCreator.generateViableMap(dimensions, self._gates, self._keys,
                                                  weightedNeutral, endNode, startNode)
 
-   def loadMap(self, fileName):
-      """Load a map saved to file"""
+   def loadTemplate(self, fileName):
+      """Create a new map from a saved template"""
       with open(fileName, "rb") as pFile:
          md = pickle.load(pFile)
          self._g               =  md._g
@@ -84,12 +84,55 @@ class LevelTester():
       self.prepareMap()
       self._won = False
 
-   def saveMap(self, fileName):
-      """Save a map to file"""
+   def loadMap(self, fileName):
+      """Load in a previously saved map"""
+      with open(fileName, "rb") as pFile:
+         md = pickle.load(pFile)
+         self._g               =  md._templateData._g
+         self._keys            =  md._templateData._keys
+         self._gates           =  md._templateData._gates
+         self._m               =  md._templateData._m
+         self._n               =  md._templateData._n
+         self._endNode         =  md._templateData._endNode
+         self._ordering        =  md._templateData._ordering
+         self._weightedNeutral =  md._templateData._weightedNeutral
+         self._startNode       =  md._templateData._startNode
+         self._finish          =  md._finish
+         self._walls           =  md._walls
+         self._platforms       =  md._platforms
+         self._physicalKeys    =  md._physicalKeys
+         self._player          =  Avatar(md._playerStart)
+      self._finish.undoPickleSafe()
+      for wall in self._walls: wall.undoPickleSafe()
+      for plat in self._platforms: plat.undoPickleSafe()
+      for key in self._physicalKeys: key.undoPickleSafe()
+      self._won = False
+      
+
+   def saveTemplate(self, fileName):
+      """Save a map template to file"""
       md = MapData(self._g, self._keys, self._gates, self._m, self._n, self._endNode,
                    self._ordering, self._startNode, self._weightedNeutral)
       with open(fileName, "wb") as pFile:
          pickle.dump(md, pFile, protocol=pickle.HIGHEST_PROTOCOL)
+
+   def saveMap(self, fileName):
+      """Save a map to file"""
+      md = MapData(self._g, self._keys, self._gates, self._m, self._n, self._endNode,
+                   self._ordering, self._startNode, self._weightedNeutral)
+      for wall in self._walls: wall.makePickleSafe()
+      for platform in self._platforms: platform.makePickleSafe()
+      for key in self._physicalKeys: key.makePickleSafe()
+      self._finish.makePickleSafe()
+      gm = GeneratedMap(md, self._finish, self._walls, self._platforms,
+                        self._physicalKeys, self._playerStart)
+      with open(fileName, "wb") as pFile:
+         pickle.dump(gm, pFile, protocol=pickle.HIGHEST_PROTOCOL)
+
+      self._finish.undoPickleSafe()
+      for wall in self._walls: wall.undoPickleSafe()
+      for plat in self._platforms: plat.undoPickleSafe()
+      for key in self._physicalKeys: key.undoPickleSafe()
 
    def newMap(self):
       """Create a new map using the current dimensions and gate ordering"""
@@ -210,10 +253,9 @@ class LevelTester():
             self._physicalKeys.append(Key(midCoord, keyColor, keyType))
 
       # Create a player object
-      
-      startPos = (startCoord[0] + u,
+      self._playerStart = (startCoord[0] + u,
                   ((topCorners[self._startNode-1][1]*roomSize[1])+(roomSize[1]//2))+startCoord[1])
-      self._player = Avatar(startPos)
+      self._player = Avatar(self._playerStart)
 
       # Separate the platforms and walls into their components (for collision detection)
       self._platformParts = []
@@ -279,10 +321,7 @@ class LevelTester():
          # Save the current map when s is pressed
          if event.key == pygame.K_s:
             sfile = input("Name the file to be saved: ")
-            self.saveMap("maps\\" + sfile + ".mapdat")
-         # Generate a new map when n is pressed
-##         elif event.key == pygame.K_n:
-##            self.newMap()
+            self.saveMap("maps\\" + sfile + ".mapfile")
 
    def update(self, worldsize, ticks):
       """Update the level state and display"""
@@ -395,7 +434,7 @@ def main():
             RUNNING = False
  
          if event.type==pygame.KEYDOWN:
-            # Load in a saved map when o is pressed
+            # Load in a saved map when control + o is pressed
             if event.key == pygame.K_o and \
                event.mod & pygame.KMOD_CTRL:
                loadmenu.display()
@@ -405,9 +444,15 @@ def main():
                level.plot()
                gameClock.tick() # effectively pauses the clock
                gameClock.tick() # while the plot is displayed
+            # Generate a new map when control + n is pressed 
             if event.key == pygame.K_n and \
                event.mod & pygame.KMOD_CTRL:
                level.newMap()
+               gameClock.tick() # effectively pauses the clock for
+               gameClock.tick() # a reload
+            if event.key == pygame.K_l:
+               file = input("Give me a file name:")
+               level.loadMap("maps//" + file + ".mapfile")
                gameClock.tick() # effectively pauses the clock for
                gameClock.tick() # a reload
 
@@ -415,7 +460,7 @@ def main():
 
          sel = loadmenu.handleEvent(event)
          if sel != None:
-            level.loadMap("maps\\" + sel + ".mapdat")
+            level.loadTemplate("templates\\" + sel + ".mapdat")
 
       #Calculate ticks
       ticks = gameClock.get_time() / 1000
