@@ -94,6 +94,8 @@ class Avatar(Drawable):
         else:
             self._velocity.x = 0
 
+        #print(self._fsm.getCurrentState())
+
         if (self._fsm.getCurrentState() == "standing" or \
            self._fsm.getCurrentState() == "walking") and \
            not self._onGround:
@@ -113,13 +115,6 @@ class Avatar(Drawable):
                 self._velocity.y = self._maxVelocity
             else:
                 self._fsm.changeState("stop")
-                
-##        if self._movement[pygame.K_UP]:
-##            self._velocity.y = -self._maxVelocity
-##        elif self._movement[pygame.K_DOWN]:
-##            self._velocity.y = self._maxVelocity
-##        else:
-##            self._velocity.y = 0
 
         #Update the position of the star based on its current velocity and ticks
         newPosition = self._position + (self._velocity * ticks)

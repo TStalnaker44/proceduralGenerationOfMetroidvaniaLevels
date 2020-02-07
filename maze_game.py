@@ -281,8 +281,8 @@ class LevelTester():
             sfile = input("Name the file to be saved: ")
             self.saveMap("maps\\" + sfile + ".mapdat")
          # Generate a new map when n is pressed
-         elif event.key == pygame.K_n:
-            self.newMap()
+##         elif event.key == pygame.K_n:
+##            self.newMap()
 
    def update(self, worldsize, ticks):
       """Update the level state and display"""
@@ -372,7 +372,7 @@ def main():
    while RUNNING:
 
       #Increment the clock
-      gameClock.tick()
+      gameClock.tick(60) # Throttle the frame rate to prevent jerkiness
 
       #Draw the background to the screen
       screen.fill((140,50,20))
@@ -403,6 +403,13 @@ def main():
             if event.key == pygame.K_p and \
                event.mod & pygame.KMOD_CTRL:
                level.plot()
+               gameClock.tick() # effectively pauses the clock
+               gameClock.tick() # while the plot is displayed
+            if event.key == pygame.K_n and \
+               event.mod & pygame.KMOD_CTRL:
+               level.newMap()
+               gameClock.tick() # effectively pauses the clock for
+               gameClock.tick() # a reload
 
          level.handleEvent(event)
 
