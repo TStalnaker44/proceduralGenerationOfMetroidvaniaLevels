@@ -460,7 +460,10 @@ def main():
 
          sel = loadmenu.handleEvent(event)
          if sel != None:
-            level.loadTemplate("templates\\" + sel + ".mapdat")
+            if loadmenu._tabs.getActive() == 1: 
+               level.loadTemplate("templates\\" + sel + ".mapdat")
+            else:
+               level.loadMap("maps\\" + sel + ".mapfile")
 
       #Calculate ticks
       ticks = gameClock.get_time() / 1000

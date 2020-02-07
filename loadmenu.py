@@ -33,9 +33,9 @@ class LoadMenu(Drawable, Window):
         buttonYpos = (self._height - buttonHeight) - 15
 
         self._tabs = Tabs(["Maps","Templates"], (0,0),
-                          self._font, (255,255,255), (0,0,0),
-                          (self._width, 35), (120,120,120),
-                          (0,0,0))
+                          self._font, (0,0,0), (120,120,120),
+                          (self._width, 35), (0,0,0),
+                          (255,255,255))
         
         self._loadButton = Button("Load", (buttonXpos,buttonYpos),
                                     self._font, (0,0,0), (0,255,0),
@@ -44,7 +44,7 @@ class LoadMenu(Drawable, Window):
                                     self._font, (0,0,0), (120,120,150),
                                     buttonHeight, buttonWidth//2, (0,0,0), 2)
 
-        self._options = [{"text":x[10:][:-7],"func":self.updateSelection,"args":x[10:][:-7]} for x in glob.glob("templates/*")]
+        self._options = [{"text":x[5:][:-8],"func":self.updateSelection,"args":x[5:][:-8]} for x in glob.glob("maps/*")]
         self._levelSelect = ScrollSelector((pos[0]+3+buttonXpos,pos[1]+45),(buttonWidth,buttonHeight*2.75),
                                            30,self._options,(0,0,0))
 
@@ -59,9 +59,23 @@ class LoadMenu(Drawable, Window):
         self._loadButton.handleEvent(event, self.load, offset=self._offset)
         self._cancelButton.handleEvent(event, self.cancel, offset=self._offset)
         self._levelSelect.handleEvent(event)
+        
+        active = self._tabs.getActive()
         self._tabs.handleEvent(event, offset=self._offset)
+        if active != self._tabs.getActive(): self.updateOptions()
+        
         self.updateMenu()
         return self.getSelection()
+
+    def updateOptions(self):
+        if self._tabs.getActive() == 1:
+            self._options = [{"text":x[10:][:-7],"func":self.updateSelection,"args":x[10:][:-7]}
+                             for x in glob.glob("templates/*")]
+        else:
+            self._options = [{"text":x[5:][:-8],"func":self.updateSelection,"args":x[5:][:-8]}
+                             for x in glob.glob("maps/*")]
+        self._levelSelect.updateSelections(self._options)
+        self._textbox.setText("")
 
     def updateSelection(self, text):
         self._textbox.setText(text)
