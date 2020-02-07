@@ -49,7 +49,7 @@ class Tabs(Drawable):
     def handleEvent(self, event, offset=(0,0)):
         """Handle events on all tabs"""
         if event.type == pygame.MOUSEBUTTONDOWN and event.button==1:
-            if self.getCollideRect().collidepoint(event.pos):
+            if self.getCollideRect().move(*offset).collidepoint(event.pos):
                 for tab in self._tabs:
                     rect = tab.getCollideRect().move(self._position[0], self._position[1])
                     rect = rect.move(offset[0], offset[1])

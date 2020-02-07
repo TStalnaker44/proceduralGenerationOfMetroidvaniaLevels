@@ -27,10 +27,15 @@ class LoadMenu(Drawable, Window):
         self._backgroundColor = (80,80,80)
 
         buttonWidth  = 3 * (self._width // 4)
-        buttonHeight = (self._height-30) // 4
+        buttonHeight = (self._height-30) // 5
 
         buttonXpos = self._width//2 - buttonWidth // 2
         buttonYpos = (self._height - buttonHeight) - 15
+
+        self._tabs = Tabs(["Maps","Templates"], (0,0),
+                          self._font, (255,255,255), (0,0,0),
+                          (self._width, 35), (120,120,120),
+                          (0,0,0))
         
         self._loadButton = Button("Load", (buttonXpos,buttonYpos),
                                     self._font, (0,0,0), (0,255,0),
@@ -40,10 +45,11 @@ class LoadMenu(Drawable, Window):
                                     buttonHeight, buttonWidth//2, (0,0,0), 2)
 
         self._options = [{"text":x[10:][:-7],"func":self.updateSelection,"args":x[10:][:-7]} for x in glob.glob("templates/*")]
-        self._levelSelect = ScrollSelector((pos[0]+3+buttonXpos,pos[1]+10),(buttonWidth,buttonHeight*2.5),
+        self._levelSelect = ScrollSelector((pos[0]+3+buttonXpos,pos[1]+45),(buttonWidth,buttonHeight*2.75),
                                            30,self._options,(0,0,0))
 
-        self._textbox = TextInput((buttonXpos,15+(buttonHeight*2.5)),self._smallFont, (buttonWidth, 25))
+        self._textbox = TextInput((buttonXpos,buttonYpos - (25 + 10)),
+                                  self._smallFont, (buttonWidth, 25))
         self._selection = None
 
         self.updateMenu()
@@ -53,6 +59,7 @@ class LoadMenu(Drawable, Window):
         self._loadButton.handleEvent(event, self.load, offset=self._offset)
         self._cancelButton.handleEvent(event, self.cancel, offset=self._offset)
         self._levelSelect.handleEvent(event)
+        self._tabs.handleEvent(event, offset=self._offset)
         self.updateMenu()
         return self.getSelection()
 
@@ -97,6 +104,7 @@ class LoadMenu(Drawable, Window):
         self._loadButton.draw(surf)
         self._cancelButton.draw(surf)
         self._textbox.draw(surf)
+        self._tabs.draw(surf)
         
         
         # Blit the widget layer onto the back surface
