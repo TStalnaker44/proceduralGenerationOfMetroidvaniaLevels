@@ -45,6 +45,8 @@ class Avatar(Drawable):
         self._jumpTime = 0.5
         self._jumpTimer = 0
 
+        self._jumpCount = 0
+
         self._gravity = 2
         self._friction = 0.3
         self._jumpPower = 125
@@ -66,6 +68,12 @@ class Avatar(Drawable):
                self._onGround:
                 self._fsm.changeState("jump")
                 self._onGround = False
+                self._jumpCount += 1
+                
+            elif (self._fsm.getCurrentState() == "jumping") and \
+                 self._jumpCount < 2:
+                self._jumpTimer = self._jumpTime
+                self._jumpCount += 1
                 
         if event.type == pygame.KEYDOWN:
             self._movement[event.key] = True
@@ -98,6 +106,7 @@ class Avatar(Drawable):
             else:
                 self._fsm.changeState("fall")
                 self._jumpTimer = self._jumpTime
+                self._jumpCount = 0
                 
         if self._fsm.getCurrentState() == "falling":
             if not self._onGround:
