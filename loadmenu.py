@@ -54,6 +54,11 @@ class LoadMenu(Drawable, Window):
 
         self.updateMenu()
 
+    def display(self):
+        Window.display(self)
+        self.updateOptions()
+        self.updateMenu()
+
     def handleEvent(self, event):
         """Handles events on the pause menu"""
         self._loadButton.handleEvent(event, self.load, offset=self._offset)

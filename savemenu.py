@@ -104,6 +104,11 @@ class SaveMenu(Drawable, Window):
         Drawable.draw(self, screen)
         self._levelSelect.draw(screen)
 
+    def display(self):
+        Window.display(self)
+        self.updateOptions()
+        self.updateMenu()
+
     def updateMenu(self):
         """Updates the display of the pause menu"""
 
