@@ -88,6 +88,12 @@ class TextInput(Drawable):
                 # Check for numpad presses
                 elif pygame.K_KP0 <= event.key <= pygame.K_KP9:
                     self._textbox.setText(text + chr(event.key-208))
+                # Check for underscore characters
+                elif (pygame.K_UNDERSCORE == event.key or \
+                     (pygame.K_MINUS == event.key and \
+                      event.mod in [pygame.KMOD_LSHIFT,pygame.KMOD_RSHIFT])) and\
+                     not self._numerical:
+                    self._textbox.setText(text + "_")
                     
             # Check if backspace was pressed
             if event.key == 8:

@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import grapher, latticeCreator
 from graphics import MySurface
 from loadmenu import LoadMenu
+from savemenu import SaveMenu
 
 n = 5#random.randint(4,10)#6
 m = 6#random.randint(4,10)#4
@@ -317,11 +318,11 @@ class LevelTester():
       else:
          for k in self._player._movement.keys(): self._player._movement[k] = False
 
-      if event.type == pygame.KEYDOWN:
-         # Save the current map when s is pressed
-         if event.key == pygame.K_s:
-            sfile = input("Name the file to be saved: ")
-            self.saveMap("maps\\" + sfile + ".mapfile")
+##      if event.type == pygame.KEYDOWN:
+##         # Save the current map when s is pressed
+##         if event.key == pygame.K_s:
+##            sfile = input("Name the file to be saved: ")
+##            self.saveMap("maps\\" + sfile + ".mapfile")
 
    def update(self, worldsize, ticks):
       """Update the level state and display"""
@@ -402,6 +403,10 @@ def main():
                        (500,300))
    loadmenu.close()
 
+   savemenu = SaveMenu((SCREEN_SIZE[0]//2 - 250,SCREEN_SIZE[1]//2-150),
+                       (500,300))
+   savemenu.close()
+
    # Create the game clock after all of the preprocessing is done
    # This prevents initial lag from effecting the beginning of the game
    gameClock = pygame.time.Clock()
@@ -420,6 +425,9 @@ def main():
 
       if loadmenu.getDisplay():
          loadmenu.draw(screen)
+
+      if savemenu.getDisplay():
+         savemenu.draw(screen)
       
       pygame.display.flip()
 
@@ -438,6 +446,10 @@ def main():
             if event.key == pygame.K_o and \
                event.mod & pygame.KMOD_CTRL:
                loadmenu.display()
+            # Load in a saved map when control + o is pressed
+            if event.key == pygame.K_s and \
+               event.mod & pygame.KMOD_CTRL:
+               savemenu.display()
             # Plot the current mapping using networkx and matplotlib
             if event.key == pygame.K_p and \
                event.mod & pygame.KMOD_CTRL:
@@ -450,20 +462,24 @@ def main():
                level.newMap()
                gameClock.tick() # effectively pauses the clock for
                gameClock.tick() # a reload
-            if event.key == pygame.K_l:
-               file = input("Give me a file name:")
-               level.loadMap("maps//" + file + ".mapfile")
-               gameClock.tick() # effectively pauses the clock for
-               gameClock.tick() # a reload
 
          level.handleEvent(event)
 
-         sel = loadmenu.handleEvent(event)
-         if sel != None:
-            if loadmenu._tabs.getActive() == 1: 
-               level.loadTemplate("templates\\" + sel + ".mapdat")
-            else:
-               level.loadMap("maps\\" + sel + ".mapfile")
+         if loadmenu.getDisplay():
+            sel = loadmenu.handleEvent(event)
+            if sel != None:
+               if loadmenu._tabs.getActive() == 1: 
+                  level.loadTemplate("templates\\" + sel + ".mapdat")
+               else:
+                  level.loadMap("maps\\" + sel + ".mapfile")
+
+         if savemenu.getDisplay():
+            sel = savemenu.handleEvent(event)
+            if sel != None:
+               if savemenu._tabs.getActive() == 1: 
+                  level.saveTemplate("templates\\" + sel + ".mapdat")
+               else:
+                  level.saveMap("maps\\" + sel + ".mapfile")
 
       #Calculate ticks
       ticks = gameClock.get_time() / 1000
