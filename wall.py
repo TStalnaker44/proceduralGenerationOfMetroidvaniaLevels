@@ -3,7 +3,29 @@ import pygame, random
 from gate import Gate
 from graphics.mysurface import MySurface
 
-class Wall():
+class Barrier():
+
+    def draw(self, screen):
+        for component in self._components:
+            component.draw(screen)
+
+    def getComponents(self):
+        return self._components
+
+    def update(self, worldsize, ticks):
+        for component in self._components:
+            component.update(worldsize, ticks)
+
+    def makePickleSafe(self):
+        for component in self._components:
+            component.makePickleSafe()
+
+    def undoPickleSafe(self):
+        for component in self._components:
+            component.undoPickleSafe()
+    
+
+class Wall(Barrier):
 
     def __init__(self, pos, connectionType, color=None,
                  size=(10,120), standardUnit=None):
@@ -102,26 +124,9 @@ class Wall():
                                              direction=1, #Set to have a horizontal direction
                                              size=(size[0],platformWidth)))
                            
-    def draw(self, screen):
-        for component in self._components:
-            component.draw(screen)
 
-    def getComponents(self):
-        return self._components
 
-    def update(self, worldsize, ticks):
-        for component in self._components:
-            component.update(worldsize, ticks)
-
-    def makePickleSafe(self):
-        for component in self._components:
-            component.makePickleSafe()
-
-    def undoPickleSafe(self):
-        for component in self._components:
-            component.undoPickleSafe()
-
-class Platform():
+class Platform(Barrier):
 
     def __init__(self, pos, connectionType, color=None,
                  size=(10,120), standardUnit=None, roomHeight=None):
@@ -190,24 +195,3 @@ class Platform():
                     direction=1,
                     size=(size[0],length),
                     passUp=True))
-            
-            
-    def draw(self, screen):
-        for component in self._components:
-            component.draw(screen)
-
-    def getComponents(self):
-        return self._components
-
-    def update(self, worldsize, ticks):
-        for component in self._components:
-            component.update(worldsize, ticks)
-
-    def makePickleSafe(self):
-        for component in self._components:
-            component.makePickleSafe()
-
-    def undoPickleSafe(self):
-        for component in self._components:
-            component.undoPickleSafe()
-
