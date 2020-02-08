@@ -146,7 +146,6 @@ class LevelTester():
 
       # Create a standard unit for creation of map
       u = Avatar((0,0)).getHeight()*1.5
-      print("Standard Unit:", u)
 
       # Initialize visual attributes
       self._walls = []
@@ -254,7 +253,7 @@ class LevelTester():
             self._physicalKeys.append(Key(midCoord, keyColor, keyType))
 
       # Create a player object
-      self._playerStart = (startCoord[0] + u,
+      self._playerStart = (topCorners[self._startNode-1][0]*roomSize[0] + u + startCoord[0],
                   ((topCorners[self._startNode-1][1]*roomSize[1])+(roomSize[1]//2))+startCoord[1])
       self._player = Avatar(self._playerStart)
 
@@ -317,12 +316,6 @@ class LevelTester():
          self._player.move(event)
       else:
          for k in self._player._movement.keys(): self._player._movement[k] = False
-
-##      if event.type == pygame.KEYDOWN:
-##         # Save the current map when s is pressed
-##         if event.key == pygame.K_s:
-##            sfile = input("Name the file to be saved: ")
-##            self.saveMap("maps\\" + sfile + ".mapfile")
 
    def update(self, worldsize, ticks):
       """Update the level state and display"""
@@ -391,7 +384,7 @@ def main():
                "orange":["yellow","white"],"yellow":"purple"}
    
    endNode   = n*m#random.randint(1,n*m)
-   startNode = 1#random.randint(1,n*m)
+   startNode = 3#random.randint(1,n*m)
    assert n*m > 3*len(ordering) # A reasonable assumption that will hopefully prevent an infinite loop
    assert 0 < endNode <= n*m
    assert 0 < startNode <= n*m
