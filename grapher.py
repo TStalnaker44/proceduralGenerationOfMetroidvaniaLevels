@@ -53,5 +53,16 @@ def getGateOrder(ordering):
     g = createGraph(ordering)
     return [x for x in nx.topological_sort(g)]
 
+def getDirectionalMapping(mappings):
+    ret = []
+    for item in mappings:
+        if type(item) == str:
+            ret.append((item, item))
+        elif type(item) == tuple:
+            ret.append(item)
+    return ret
+            
+            
+
 if __name__ == "__main__":
     tester()

@@ -8,7 +8,9 @@ dropout = 0.4
 def r():
     return random.random() > dropout
 
-def detConnection(g, i, node, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral=0):
+def detConnection(g, i, node, nodes, nodeStack, completedNodes, gates,
+                  endNode, mapping, weightedNeutral=0):
+    
     if not node in completedNodes:
         
         # If the user wants more neutral connections
@@ -23,19 +25,23 @@ def detConnection(g, i, node, nodes, nodeStack, completedNodes, gates, endNode, 
         if i == endNode or node == endNode:
             gateTech = gates[-1]
         if r():
-            # Create bi-directional connections between the two nodes
             
-            if gateTech == "red":
-                g.add_edge(i, node, object="red")
-                g.add_edge(node, i, object="grey")
+            # Create bi-directional connections between the two nodes
+            # i is on the right of or below node
+            tup = random.choice([m for m in mapping if m[0]==gateTech])
+            if i > node:
+                g.add_edge(i, node, object=tup[0])
+                g.add_edge(node, i, object=tup[1])
+            # i is to the left of or above node
             else:
-                g.add_edge(i, node, object=gateTech)
-                g.add_edge(node, i, object=gateTech)
+                g.add_edge(i, node, object=tup[1])
+                g.add_edge(node, i, object=tup[0])
+
             if node not in nodes:
                 nodeStack.append(node)
                 nodes.append(node)
 
-def createGraph(dimensions, gates, weightedNeutral=0, endNode=None):
+def createGraph(dimensions, gates, mapping, weightedNeutral=0, endNode=None):
 
     m,n = dimensions
 
@@ -54,62 +60,62 @@ def createGraph(dimensions, gates, weightedNeutral=0, endNode=None):
         # i is in the middle of the grid
         if i % n != 0 and i % n != 1 and n < i < (((m-1)*n) + 1):
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, endNode, mapping, weightedNeutral)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
             
         # i is on the top edge
         if 2 <= i <= n-1:
 
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
             
         # i is on the bottom edge
         elif ((m-1)*n)+2 <= i <= ((m-1)*n) + (n-1):
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
             
         # i is on the left edge
         elif i % n == 1 and (i != 1 and i != (((m-1)*n)+1)):
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
             
         # i is on the right edge
         elif i % n == 0 and (i != n and i != m*n):
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
             
         # i is on the top-left corner
         elif i == 1:
 
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
             
         # i is on the top-right corner
         elif i == n:
 
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i+n, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
             
         # i is on the bottom-left corner
         elif i == ((m-1)*n) + 1:
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i+1, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
             
         # i is on the bottom-right corner
         elif i == m*n:
 
-            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
-            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, endNode, weightedNeutral)
+            detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
+            detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, endNode, mapping,  weightedNeutral)
             
     return g
 
@@ -144,12 +150,12 @@ def findExplorable(g, keys, startNode=1):
 
     return reachableNodes
 
-def viableMap(dimensions, gates, keys, weightedNeutral=0, endNode=None, startNode=1):
+def viableMap(dimensions, gates, keys, mapping, weightedNeutral=0, endNode=None, startNode=1):
 
     if endNode == None:
         endNode = dimensions[0] * dimensions[1]
     
-    g = createGraph(dimensions, gates, weightedNeutral, endNode)
+    g = createGraph(dimensions, gates, mapping, weightedNeutral, endNode)
     
     # Ensure than the final node is included in the grid
     if endNode not in g:
@@ -204,11 +210,11 @@ def viableMap(dimensions, gates, keys, weightedNeutral=0, endNode=None, startNod
             
     return False
 
-def generateViableMap(dimensions, gates, keys, weightedNeutral=0, endNode=None, startNode=1):
+def generateViableMap(dimensions, gates, keys, mapping, weightedNeutral=0, endNode=None, startNode=1):
     # Create a viable map
-    g = viableMap(dimensions, gates, keys, weightedNeutral, endNode, startNode)
+    g = viableMap(dimensions, gates, keys, mapping, weightedNeutral, endNode, startNode)
     while not g:
-        g = viableMap(dimensions, gates, keys, weightedNeutral, endNode, startNode)
+        g = viableMap(dimensions, gates, keys, mapping, weightedNeutral, endNode, startNode)
     
     return g
 
@@ -231,10 +237,12 @@ def main():
     ordering = {"grey":"red","red":"green","green":"blue"}
     gates = grapher.getGateOrder(ordering)
 
+    mapping = grapher.getDirectionalMapping(["grey","red",("green","orange"),"blue"])
+
     # Create keys for each gate
     keys = {gate:1 for gate in gates}
 
-    g = generateViableMap((m,n), gates, keys)
+    g = generateViableMap((m,n), gates, keys, mapping)
 
     # Create a color mapping to visualize key locations
     color_map = []

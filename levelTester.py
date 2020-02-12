@@ -39,7 +39,7 @@ class LevelTester():
       self._endNode  =  None
       self._ordering =  None
 
-   def makeMap(self, m, n, ordering, endNode, startNode=1):
+   def makeMap(self, m, n, ordering, mapping, endNode, startNode=1):
       """Create a map with dimensions m x n, obeying the given gate ordering"""
       self._m = m
       self._n = n
@@ -49,8 +49,9 @@ class LevelTester():
       # Create a graph model
       dimensions = (m,n)
       self._gates = grapher.getGateOrder(ordering)
+      self._mapping = grapher.getDirectionalMapping(mapping)
       self._keys = {gate:startNode for gate in self._gates} #This provides default start for keys  
-      self._g = latticeCreator.generateViableMap(dimensions, self._gates, self._keys,
+      self._g = latticeCreator.generateViableMap(dimensions, self._gates, self._keys, self._mapping,
                                                  .5, endNode, startNode)
 
    def loadMap(self, fileName):
@@ -231,13 +232,13 @@ def main():
    ordering = {"red":"green","green":"blue","blue":"white",}
    #ordering = {"grey":["red","orange"],"red":"green","green":"blue",
    #            "orange":["yellow","white"],"yellow":"purple"}
-   
+   mapping = ["red",("green","orange"),"blue","white"]
    endNode   = n*m
    startNode = 1
    assert 0 < endNode <= n*m
    assert 0 < startNode <= n*m
    assert startNode != endNode
-   level.makeMap(m,n,ordering,endNode,startNode)
+   level.makeMap(m,n,ordering,mapping,endNode,startNode)
    level.prepareMap()
            
    RUNNING = True
