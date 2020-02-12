@@ -144,7 +144,7 @@ def findExplorable(g, keys, startNode=1):
 
     return reachableNodes
 
-def viableMap(dimensions, gates, weightedNeutral=0, endNode=None, startNode=1):
+def viableMap(dimensions, gates, keys, weightedNeutral=0, endNode=None, startNode=1):
 
     if endNode == None:
         endNode = dimensions[0] * dimensions[1]
@@ -169,24 +169,48 @@ def viableMap(dimensions, gates, weightedNeutral=0, endNode=None, startNode=1):
         if len(newAreas) == 0:
             return False
         
-
-        
     # Find all the primary edges
     primary_edges = ([e for e in g.edges(data=True) if e[2]['object']==gates[0]])
     
     # Determine if a primary edge connects the first node to another
     for e in primary_edges:
         if e[0] == 1:
+
+            # Place keys into the map
+            oldNewAreas = None
+            for x in range(0, len(gates)-1):
+                previouslyExplorable = set(findExplorable(g, gates[:x], startNode))
+                nowExplorable = set(findExplorable(g, gates[:x+1], startNode))
+                newAreas = list(nowExplorable - previouslyExplorable)
+
+                # Check that the key is reachable from all nodes
+                # That is, prevent there from being inescapable pits in the map,
+                # a potential byproduct of the bidirectional structure
+                keyLocation = random.choice(newAreas)
+                # Look only at the newest nodes
+                for node in previouslyExplorable - set(findExplorable(g, gates[:x-1], startNode)):
+                    # Check that a connection of some form exists
+                    if nx.has_path(g, node, keyLocation):
+                        try:
+                            # Check that there is a connection obeying the gating rules
+                            weight = lambda u, v, d: 1 if d['object'] in gates[:x+1] else None
+                            nx.bidirectional_dijkstra(g,node,keyLocation,weight)
+                        except:
+                            # If no such path exists, this isn't a viable map
+                            return False
+                # Place the key at the given, approved node
+                keys[gates[x+1]] = keyLocation
+            
             return g
         
     return False
 
 def generateViableMap(dimensions, gates, keys, weightedNeutral=0, endNode=None, startNode=1):
     # Create a viable map
-    g = viableMap(dimensions, gates, weightedNeutral, endNode, startNode)
+    g = viableMap(dimensions, gates, keys, weightedNeutral, endNode, startNode)
     while not g:
-        g = viableMap(dimensions, gates, weightedNeutral, endNode, startNode)
-    placeKeys(g, gates, keys, startNode)
+        g = viableMap(dimensions, gates, keys, weightedNeutral, endNode, startNode)
+    
     return g
 
 def placeKeys(g, gates, keys, startNode):
