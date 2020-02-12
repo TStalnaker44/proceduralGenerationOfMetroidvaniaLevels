@@ -24,8 +24,13 @@ def detConnection(g, i, node, nodes, nodeStack, completedNodes, gates, endNode, 
             gateTech = gates[-1]
         if r():
             # Create bi-directional connections between the two nodes
-            g.add_edge(i, node, object=gateTech)
-            g.add_edge(node, i, object=gateTech)
+            
+            if gateTech == "red":
+                g.add_edge(i, node, object="red")
+                g.add_edge(node, i, object="grey")
+            else:
+                g.add_edge(i, node, object=gateTech)
+                g.add_edge(node, i, object=gateTech)
             if node not in nodes:
                 nodeStack.append(node)
                 nodes.append(node)
@@ -123,11 +128,12 @@ def findExplorable(g, keys, startNode=1):
 
         # Iterate through the edges to find all (known) reachable nodes
         for edge in edges:
-            if not edge in reachableNodes:
+            #if not edge in reachableNodes:
                 if edge[0] in reachableNodes and edge[1] not in reachableNodes:
                     reachableNodes.append(edge[1])
                 elif edge[1] in reachableNodes and edge[0] not in reachableNodes:
-                    reachableNodes.append(edge[0])
+                    if edge[2] in keys:
+                        reachableNodes.append(edge[0])
 
         # Stop iterating if no new nodes were added
         if prevLen == len(reachableNodes):
@@ -135,7 +141,7 @@ def findExplorable(g, keys, startNode=1):
         # Save the new count of reachable nodes
         else:
             prevLen = len(reachableNodes)
-            
+
     return reachableNodes
 
 def viableMap(dimensions, gates, weightedNeutral=0, endNode=None, startNode=1):
@@ -160,7 +166,8 @@ def viableMap(dimensions, gates, weightedNeutral=0, endNode=None, startNode=1):
         previouslyExplorable = set(findExplorable(g, gates[:x], startNode))
         nowExplorable = set(findExplorable(g, gates[:x+1], startNode))
         newAreas = list(nowExplorable - previouslyExplorable)
-        if len(newAreas) == 0: return False
+        if len(newAreas) == 0:
+            return False
         
 
         
@@ -225,9 +232,6 @@ def main():
     edge_labels = nx.get_edge_attributes(g,'object')
     nx.draw_networkx_edge_labels(g, pos, edge_labels = edge_labels)
     plt.show()
-
-    for edge in g.edges(data=True):
-        print(edge)
 
 
 if __name__ == "__main__":
