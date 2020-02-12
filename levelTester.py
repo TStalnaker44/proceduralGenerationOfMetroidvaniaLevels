@@ -50,6 +50,7 @@ class LevelTester():
       dimensions = (m,n)
       self._gates = grapher.getGateOrder(ordering)
       self._mapping = grapher.getDirectionalMapping(mapping)
+      print(self._mapping)
       self._keys = {gate:startNode for gate in self._gates} #This provides default start for keys  
       self._g = latticeCreator.generateViableMap(dimensions, self._gates, self._keys, self._mapping,
                                                  .5, endNode, startNode)
@@ -232,7 +233,7 @@ def main():
    ordering = {"red":"green","green":"blue","blue":"white",}
    #ordering = {"grey":["red","orange"],"red":"green","green":"blue",
    #            "orange":["yellow","white"],"yellow":"purple"}
-   mapping = ["red",("green","orange"),"blue","white"]
+   mapping = ["red",("green","blue"),("blue", "green"),"blue","white"]
    endNode   = n*m
    startNode = 1
    assert 0 < endNode <= n*m
