@@ -108,7 +108,12 @@ class LevelTester():
       self._lines = Connector()
       for edge in self._g.edges(data=True):
          lineColor = self._colors[edge[2]["object"]]
-         self._lines.addLine(self._rooms[edge[0]-1], self._rooms[edge[1]-1], lineColor, 3)
+         if edge[0] > edge[1]:
+            self._lines.addLine(self._rooms[edge[0]-1], self._rooms[edge[1]-1],
+                                lineColor, 3, offset=(-5,-5))
+         else:
+            self._lines.addLine(self._rooms[edge[0]-1], self._rooms[edge[1]-1],
+                                lineColor, 3, offset=(5,5))
 
       # Create a copy of the list to allow mutations without error
       roomCopy = copy.copy(self._rooms)

@@ -23,7 +23,9 @@ def detConnection(g, i, node, nodes, nodeStack, completedNodes, gates, endNode, 
         if i == endNode or node == endNode:
             gateTech = gates[-1]
         if r():
+            # Create bi-directional connections between the two nodes
             g.add_edge(i, node, object=gateTech)
+            g.add_edge(node, i, object=gateTech)
             if node not in nodes:
                 nodeStack.append(node)
                 nodes.append(node)
@@ -32,7 +34,7 @@ def createGraph(dimensions, gates, weightedNeutral=0, endNode=None):
 
     m,n = dimensions
 
-    g = nx.Graph()
+    g = nx.DiGraph()
 
     nodeStack = []
     nodes = []
@@ -223,6 +225,9 @@ def main():
     edge_labels = nx.get_edge_attributes(g,'object')
     nx.draw_networkx_edge_labels(g, pos, edge_labels = edge_labels)
     plt.show()
+
+    for edge in g.edges(data=True):
+        print(edge)
 
 
 if __name__ == "__main__":

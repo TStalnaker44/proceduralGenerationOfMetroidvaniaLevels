@@ -18,7 +18,7 @@ from loadmenu import LoadMenu
 from savemenu import SaveMenu
 
 n = 5#random.randint(4,10)#6
-m = 6#random.randint(4,10)#4
+m = 8#random.randint(4,10)#4
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (800,500)
