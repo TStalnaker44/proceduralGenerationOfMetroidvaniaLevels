@@ -15,8 +15,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from graphics import *
 
-m = 4#random.randint(5,8) # number of rows
-n = 5#random.randint(5,8) # number of columns
+m = 6#random.randint(5,8) # number of rows
+n = 6#random.randint(5,8) # number of columns
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (n*100,m*100)
@@ -39,7 +39,7 @@ class LevelTester():
       self._endNode  =  None
       self._ordering =  None
 
-   def makeMap(self, m, n, ordering, mapping, endNode, startNode=1):
+   def makeMap(self, m, n, ordering, h_mapping, v_mapping, endNode, startNode=1):
       """Create a map with dimensions m x n, obeying the given gate ordering"""
       self._m = m
       self._n = n
@@ -49,10 +49,11 @@ class LevelTester():
       # Create a graph model
       dimensions = (m,n)
       self._gates = grapher.getGateOrder(ordering)
-      self._mapping = grapher.getDirectionalMapping(mapping)
-      print(self._mapping)
+      self._h_mapping = grapher.getDirectionalMapping(h_mapping)
+      self._v_mapping = grapher.getDirectionalMapping(v_mapping)
+      self._mappings = (self._h_mapping, self._v_mapping)
       self._keys = {gate:startNode for gate in self._gates} #This provides default start for keys  
-      self._g = latticeCreator.generateViableMap(dimensions, self._gates, self._keys, self._mapping,
+      self._g = latticeCreator.generateViableMap(dimensions, self._gates, self._keys, self._mappings,
                                                  .5, endNode, startNode)
 
    def loadMap(self, fileName):
@@ -230,16 +231,20 @@ def main():
    
    #Create the Level Tester object
    level = LevelTester(SCREEN_SIZE)
-   ordering = {"red":"green","green":"blue","blue":"white",}
+   ordering = {"red":"green","green":["blue","orange"],"blue":"white","orange":"grey"}
    #ordering = {"grey":["red","orange"],"red":"green","green":"blue",
    #            "orange":["yellow","white"],"yellow":"purple"}
-   mapping = ["red",("green","blue"),("blue", "green"),"blue","white"]
+
+   # The starter gate type and all potential end types need to be included in these lists,
+   # otherwise a crash could occur
+   h_mapping = ["red",("blue", "green"),"blue","white","grey"]
+   v_mapping = ["red",("green","blue"),"orange","white","grey"]
    endNode   = n*m
    startNode = 1
    assert 0 < endNode <= n*m
    assert 0 < startNode <= n*m
    assert startNode != endNode
-   level.makeMap(m,n,ordering,mapping,endNode,startNode)
+   level.makeMap(m,n,ordering,h_mapping,v_mapping,endNode,startNode)
    level.prepareMap()
            
    RUNNING = True
