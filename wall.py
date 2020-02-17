@@ -48,7 +48,7 @@ class Wall(Barrier):
         # Add a wall with some sort of a gate
         else:
             
-            variant = 1#random.randint(1,2)
+            variant = 2#random.randint(1,2)
                 
             # Create a wall with the gate entrance at ground level
             if variant == 1:
@@ -114,15 +114,28 @@ class Wall(Barrier):
                                                  size=(size[0],topHeight)
                                                  ))
 
-                # Add the gate component unless there's a neutral connection
-                if connectionType != "neutral":
+                # Add the left gate component unless there's a neutral connection
+                if connectionType[0] != "neutral":
                     g = Gate(
                         # Start the gate at the y position just under the top section
                         (self._position[0],self._position[1]+topHeight),
-                        color, # gate color
-                        connectionType, # key to unlock the gate
+                        color[0], # gate color
+                        connectionType[0], # key to unlock the gate
                         direction=0, # direction of the gate (vertical)
-                        size=(size[0],gateHeight)) # set the size of the gate
+                        size=(size[0]//2,gateHeight),
+                        passThrough = (False, False, False, True)) # set the size of the gate
+                    self._components.append(g)
+
+                # Add the right gate component unless there's a neutral connection
+                if connectionType[1] != "neutral":
+                    g = Gate(
+                        # Start the gate at the y position just under the top section
+                        (self._position[0]+(size[0]//2),self._position[1]+topHeight),
+                        color[1], # gate color
+                        connectionType[1], # key to unlock the gate
+                        direction=0, # direction of the gate (vertical)
+                        size=(size[0]//2,gateHeight),
+                        passThrough = (False, False, True, False)) # set the size of the gate
                     self._components.append(g)
 
                 # Add the bottom floor level piece, used to make map corners look nice

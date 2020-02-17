@@ -415,7 +415,7 @@ def main():
    #            "orange":["yellow","white"],"yellow":"purple"}
 
    h_mapping = ["neutral",("red","blue"),"green","blue","white"]
-   v_mapping = ["neutral","red","green","blue","white"]
+   v_mapping = ["neutral","red",("green","neutral"),"blue","white"]
    
    endNode   = n*m
    startNode = 3
