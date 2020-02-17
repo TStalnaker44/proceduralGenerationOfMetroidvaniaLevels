@@ -56,8 +56,6 @@ class LevelTester():
       self._h_mapping = grapher.getDirectionalMapping(h_mapping)
       self._v_mapping = grapher.getDirectionalMapping(v_mapping)
       self._mappings = (self._h_mapping, self._v_mapping)
-      print(self._mappings[0])
-      print(self._mappings[1])
       self._gates = grapher.getGateOrder(ordering)
       self._keys = {gate:startNode for gate in self._gates} #This provides default start for keys
       self._weightedNeutral = weightedNeutral
@@ -89,6 +87,13 @@ class LevelTester():
          except:
             self._startNode = 1
 
+         try:
+            self._h_mapping = md._h_mapping
+            self._v_mapping = md._v_mapping
+         except:
+            self._h_mapping = grapher.getDirectionalMapping(md._ordering)
+            self._v_mapping = grapher.getDirectionalMapping(md._ordering)
+
       self.prepareMap()
       self._won = False
 
@@ -105,6 +110,12 @@ class LevelTester():
          self._ordering        =  md._templateData._ordering
          self._weightedNeutral =  md._templateData._weightedNeutral
          self._startNode       =  md._templateData._startNode
+         try:
+            self._h_mapping    =  md._templateData._h_mapping
+            self._v_mapping    =  md._templateData._v_mapping
+         except:
+            self._h_mapping = grapher.getDirectionalMapping(md._templateData._gates)
+            self._v_mapping = grapher.getDirectionalMapping(md._templateData._gates)
          self._finish          =  md._finish
          self._walls           =  md._walls
          self._platforms       =  md._platforms
@@ -120,14 +131,16 @@ class LevelTester():
    def saveTemplate(self, fileName):
       """Save a map template to file"""
       md = MapData(self._g, self._keys, self._gates, self._m, self._n, self._endNode,
-                   self._ordering, self._startNode, self._weightedNeutral)
+                   self._ordering, self._startNode, self._weightedNeutral,
+                   self._h_mapping, self._v_mapping)
       with open(fileName, "wb") as pFile:
          pickle.dump(md, pFile, protocol=pickle.HIGHEST_PROTOCOL)
 
    def saveMap(self, fileName):
       """Save a map to file"""
       md = MapData(self._g, self._keys, self._gates, self._m, self._n, self._endNode,
-                   self._ordering, self._startNode, self._weightedNeutral)
+                   self._ordering, self._startNode, self._weightedNeutral,
+                   self._h_mapping, self._v_mapping)
       for wall in self._walls: wall.makePickleSafe()
       for platform in self._platforms: platform.makePickleSafe()
       for key in self._physicalKeys: key.makePickleSafe()
@@ -144,7 +157,8 @@ class LevelTester():
 
    def newMap(self):
       """Create a new map using the current dimensions and gate ordering"""
-      self.makeMap(self._m, self._n, self._ordering, self._endNode, self._startNode, self._weightedNeutral)
+      self.makeMap(self._m, self._n, self._ordering, self._h_mapping, self._v_mapping,
+                   self._endNode, self._startNode, self._weightedNeutral)
       self.prepareMap()
       self._won = False
 

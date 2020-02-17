@@ -5,7 +5,7 @@ class MapData():
     seed to generate many distinct, yet similar maps"""
 
     def __init__(self, g, keys, gates, m, n, endNode, ordering,
-                 startNode, weightedNeutral):
+                 startNode, weightedNeutral, h_mapping, v_mapping):
         self._g = g
         self._keys = keys
         self._gates = gates
@@ -15,6 +15,8 @@ class MapData():
         self._ordering = ordering
         self._startNode = startNode
         self._weightedNeutral = weightedNeutral
+        self._h_mapping = h_mapping
+        self._v_mapping = v_mapping
 
 class GeneratedMap():
     """Class that represents a fully generated map.  That is that
