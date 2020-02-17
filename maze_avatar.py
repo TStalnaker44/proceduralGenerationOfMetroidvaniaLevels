@@ -161,8 +161,6 @@ class Avatar(Drawable):
                 # Check if the player can pass through a given platform
                 if not other.getType() in self._keys and \
                    self.getCollideRect().colliderect(other.getCollideRect()):
-
-                    print(other.getType())
                 
                     # Check that the player is moving right
                     if self._velocity.x > 0 and not other._passThrough[2]:

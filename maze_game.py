@@ -56,6 +56,8 @@ class LevelTester():
       self._h_mapping = grapher.getDirectionalMapping(h_mapping)
       self._v_mapping = grapher.getDirectionalMapping(v_mapping)
       self._mappings = (self._h_mapping, self._v_mapping)
+      print(self._mappings[0])
+      print(self._mappings[1])
       self._gates = grapher.getGateOrder(ordering)
       self._keys = {gate:startNode for gate in self._gates} #This provides default start for keys
       self._weightedNeutral = weightedNeutral
@@ -181,8 +183,16 @@ class LevelTester():
       # forward edges and backwards edges and create a
       # mapping between the two
       forwardEdges = [edge for edge in self._g.edges(data=True) if edge[0] < edge[1]]
-      backwardEdges = [edge for edge in self._g.edges(data=True) if edge[0] > edge[1]]
-      backwardEdges.sort(key=lambda x: x[1])
+      bEdges = [edge for edge in self._g.edges(data=True) if edge[0] > edge[1]]
+
+      # Order the backwards edges to match with those
+      # of the forward variety
+      backwardEdges = []
+      for x in forwardEdges:
+         for y in bEdges:
+            if y[0] == x[1] and y[1] == x[0]:
+               backwardEdges.append(y)
+               break
 
       # Add connections between rooms
       for i, edge in enumerate(forwardEdges):
@@ -404,7 +414,7 @@ def main():
    #ordering = {"neutral":"grey","grey":["red","orange"],"red":"green","green":"blue",
    #            "orange":["yellow","white"],"yellow":"purple"}
 
-   h_mapping = ["neutral","red","green","blue","white"]
+   h_mapping = ["neutral",("red","blue"),"green","blue","white"]
    v_mapping = ["neutral","red","green","blue","white"]
    
    endNode   = n*m
