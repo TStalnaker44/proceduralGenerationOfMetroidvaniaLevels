@@ -196,7 +196,7 @@ def viableMap(dimensions, gates, keys, mappings, weightedNeutral=0, endNode=None
         # a potential byproduct of the bidirectional structure
         keyLocation = random.choice(newAreas)
         # Look only at the newest nodes
-        for node in previouslyExplorable - set(findExplorable(g, gates[:x-1], startNode)):
+        for node in nowExplorable:
             # Check that a connection of some form exists
             if nx.has_path(g, node, keyLocation):
                 try:
