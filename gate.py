@@ -9,7 +9,9 @@ import pygame
 class Gate(Drawable):
 
     def __init__(self, position, color, gateType, direction=0,
-                 size=(10,40), passUp=False):
+                 size=(10,40), passThrough=(False,False,False,False)):
+
+        #Pass Through (Up, Down, Left, Right)
         super().__init__("", position)
         self._direction = direction #The directionality of the gate
         if direction==0:
@@ -21,7 +23,7 @@ class Gate(Drawable):
         self._image = pygame.Surface((self._width, self._height))
         self._image.fill(color)
         self._type = gateType
-        self._passUp = passUp
+        self._passThrough = passThrough
         
 
     def getType(self):

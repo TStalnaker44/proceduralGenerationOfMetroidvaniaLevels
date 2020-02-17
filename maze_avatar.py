@@ -138,7 +138,7 @@ class Avatar(Drawable):
                    self.getCollideRect().colliderect(other.getCollideRect()):
                 
                     # Check that the player is falling
-                    if self._velocity.y > 0:
+                    if self._velocity.y > 0 and not other._passThrough[1]:
                         # Check that the player is above the platform
                         if self.getY() + self.getHeight()//2 < other.getY(): 
                             #Put the player on the platform
@@ -146,7 +146,7 @@ class Avatar(Drawable):
                             self._onGround = True
 
                     # Check that the player is jumping
-                    elif self._velocity.y < 0 and not other._passUp:
+                    elif self._velocity.y < 0 and not other._passThrough[0]:
                         # Check that the player is above the platform
                         if self.getY() + (self.getHeight()//2)  > other.getY(): 
                             #Put the player on the platform
@@ -161,9 +161,11 @@ class Avatar(Drawable):
                 # Check if the player can pass through a given platform
                 if not other.getType() in self._keys and \
                    self.getCollideRect().colliderect(other.getCollideRect()):
+
+                    print(other.getType())
                 
                     # Check that the player is moving right
-                    if self._velocity.x > 0:
+                    if self._velocity.x > 0 and not other._passThrough[2]:
                         # Check that the player is above the platform
                         if self.getX() + self.getWidth()//2 < other.getX(): 
                             #Put the player on the platform
@@ -171,7 +173,7 @@ class Avatar(Drawable):
                             self._velocity.x = 0 # Reset the player's velocity
 
                     # Check that the player is moving left
-                    elif self._velocity.x < 0:
+                    elif self._velocity.x < 0 and not other._passThrough[3]:
                         # Check that the player is above the platform
                         if self.getX() + (self.getWidth()//2) > other.getX(): 
                             #Put the player on the platform

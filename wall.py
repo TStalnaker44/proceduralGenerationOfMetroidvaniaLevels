@@ -48,13 +48,13 @@ class Wall(Barrier):
         # Add a wall with some sort of a gate
         else:
             
-            variant = random.randint(1,2)
+            variant = 1#random.randint(1,2)
                 
             # Create a wall with the gate entrance at ground level
             if variant == 1:
 
                 # Create the top portion of the wall
-                if connectionType != "neutral" or random.random() > .5:
+                if connectionType[0] != "neutral" or connectionType[1] != "neutral" or random.random() > .5:
                     self._components.append(
                         Gate(self._position, #start at position provided to the wall
                              self._neutral, #neutral (grey) coloring
@@ -67,16 +67,30 @@ class Wall(Barrier):
                              )
                         )
                 
-                # Add the game component unless there is a neutral connection
-                if connectionType != "neutral":
+                # Add the left gate component unless there is a neutral connection
+                if connectionType[0] != "neutral":
                     g = Gate(
                         # Start the gate at the y position just under the top section, but
                         # leave space below for the final wall piece
                         (self._position[0],self._position[1]+(size[1]-(gateHeight + size[0]))),
-                        color, # gate color
-                        connectionType, # key to unlock the gate
+                        color[0], # gate color
+                        connectionType[0], # key to unlock the gate
                         direction=0, # direction of the gate (vertical)
-                        size=(size[0],gateHeight)) # set the size of the gate
+                        size=(size[0]//2,gateHeight),
+                        passThrough = (False, False, False, True)) # set the size of the gate
+                    self._components.append(g)
+
+                # Add the right gate component unless there is a neutral connection
+                if connectionType[1] != "neutral":
+                    g = Gate(
+                        # Start the gate at the y position just under the top section, but
+                        # leave space below for the final wall piece
+                        (self._position[0]+(size[0]//2),self._position[1]+(size[1]-(gateHeight + size[0]))),
+                        color[1], # gate color
+                        connectionType[1], # key to unlock the gate
+                        direction=0, # direction of the gate (vertical)
+                        size=(size[0]//2,gateHeight),
+                        passThrough = (False, False, True, False)) # set the size of the gate
                     self._components.append(g)
                     
                 # Add the bottom floor level piece, used to make map corners look nice
@@ -165,14 +179,27 @@ class Platform(Barrier):
                 direction=1,
                 size=(size[0],leftEdgeLength)))
 
-            if connectionType != "neutral": 
+            # Create the upper gate component
+            if connectionType[0] != "neutral": 
                 # Create the gated opening
                 self._components.append(Gate(
                     (self._position[0]+leftEdgeLength,self._position[1]),
-                    color,
-                    connectionType,
+                    color[0],
+                    connectionType[0],
                     direction=1,
-                    size=(size[0],gateWidth)))            
+                    size=(size[0]//2,gateWidth),
+                    passThrough=(True,False,False,False)))
+
+            # Create the lower gate component
+            if connectionType[1] != "neutral": 
+                # Create the gated opening
+                self._components.append(Gate(
+                    (self._position[0]+leftEdgeLength,self._position[1]+(size[0]//2)),
+                    color[1],
+                    connectionType[1],
+                    direction=1,
+                    size=(size[0]//2,gateWidth),
+                    passThrough=(False,True,False,False))) 
 
             # Create the right subpart
             self._components.append(Gate(
@@ -194,4 +221,4 @@ class Platform(Barrier):
                     99,
                     direction=1,
                     size=(size[0],length),
-                    passUp=True))
+                    passThrough=(True,False,False,False)))

@@ -177,21 +177,37 @@ class LevelTester():
          rooms.append(edge[1])
       rooms = set(rooms)
 
+      # Split the edges of the graph into two types
+      # forward edges and backwards edges and create a
+      # mapping between the two
+      forwardEdges = [edge for edge in self._g.edges(data=True) if edge[0] < edge[1]]
+      backwardEdges = [edge for edge in self._g.edges(data=True) if edge[0] > edge[1]]
+      backwardEdges.sort(key=lambda x: x[1])
+
       # Add connections between rooms
-      for edge in self._g.edges(data=True):
-         gateType = edge[2]["object"]
-         gateColor = self._colors.get(edge[2]["object"], None)
+      for i, edge in enumerate(forwardEdges):
+
+         # Determine the types of gates present in the gateway
+         gateTypeForward = edge[2]["object"]
+         gateTypeBackward = backwardEdges[i][2]["object"]
+         gateTypes = (gateTypeForward, gateTypeBackward)
+
+         # Determine the colors of the gates present in the gateway
+         gateColorForward = self._colors.get(edge[2]["object"], None)
+         gateColorBackward = self._colors.get(backwardEdges[i][2]["object"],None)
+         gateColors = (gateColorForward, gateColorBackward)
+         
          r = edge[0]
          if edge[1] == r+1:
             r_pos = topCorners[r-1]
             x_pos = ((r_pos[0]+1) * roomSize[0]) + startCoord[0]
             y_pos = (r_pos[1] * roomSize[1]) + startCoord[1]
-            self._walls.append(Wall((x_pos, y_pos), gateType, gateColor, size=wallSize, standardUnit=u))
+            self._walls.append(Wall((x_pos, y_pos), gateTypes, gateColors, size=wallSize, standardUnit=u))
          elif edge[1] == r+self._n:
             r_pos = topCorners[r-1]
             x_pos = (r_pos[0] * roomSize[0]) + startCoord[0]
             y_pos = ((r_pos[1]+1) * roomSize[1]) + startCoord[1]
-            self._platforms.append(Platform((x_pos, y_pos), gateType, gateColor,
+            self._platforms.append(Platform((x_pos, y_pos), gateTypes, gateColors,
                                             size=platformSize, standardUnit=u,
                                             roomHeight=wallSize[1]))
 
@@ -389,7 +405,7 @@ def main():
    #            "orange":["yellow","white"],"yellow":"purple"}
 
    h_mapping = ["neutral","red","green","blue","white"]
-   v_mapping = ["neutral","green","blue","white"]
+   v_mapping = ["neutral","red","green","blue","white"]
    
    endNode   = n*m
    startNode = 3
