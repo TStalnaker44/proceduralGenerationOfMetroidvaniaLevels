@@ -17,8 +17,8 @@ from graphics import MySurface
 from loadmenu import LoadMenu
 from savemenu import SaveMenu
 
-n = 5#random.randint(4,10)#6
-m = 8#random.randint(4,10)#4
+n = 4#random.randint(4,10)#6
+m = 4#random.randint(4,10)#4
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (800,500)
@@ -45,20 +45,25 @@ class LevelTester():
       self._startNode       = None
       self._weightedNeutral = None
 
-   def makeMap(self, m, n, ordering, endNode, startNode=1, weightedNeutral=0.5):
+   def makeMap(self, m, n, ordering, h_mapping, v_mapping,
+               endNode, startNode=1, weightedNeutral=0.5):
       """Create a map with dimensions m x n, obeying the given gate ordering"""
       self._m = m
       self._n = n
       self._endNode = endNode
       self._startNode = startNode
       self._ordering = ordering
+      self._h_mapping = grapher.getDirectionalMapping(h_mapping)
+      self._v_mapping = grapher.getDirectionalMapping(v_mapping)
+      self._mappings = (self._h_mapping, self._v_mapping)
       self._gates = grapher.getGateOrder(ordering)
       self._keys = {gate:startNode for gate in self._gates} #This provides default start for keys
       self._weightedNeutral = weightedNeutral
       # Create a graph model
       dimensions = (m,n)
       self._g = latticeCreator.generateViableMap(dimensions, self._gates, self._keys,
-                                                 weightedNeutral, endNode, startNode)
+                                                 self._mappings, weightedNeutral, endNode,
+                                                 startNode)
 
    def loadTemplate(self, fileName):
       """Create a new map from a saved template"""
@@ -379,17 +384,20 @@ def main():
    avatar = Avatar((100,100))
 
    level = LevelTester(SCREEN_SIZE, WORLD_SIZE)
-   #ordering = {"neutral":"red","red":"green","green":"blue","blue":"white",}
-   ordering = {"neutral":"grey","grey":["red","orange"],"red":"green","green":"blue",
-               "orange":["yellow","white"],"yellow":"purple"}
+   ordering = {"neutral":"red","red":"green","green":"blue","blue":"white",}
+   #ordering = {"neutral":"grey","grey":["red","orange"],"red":"green","green":"blue",
+   #            "orange":["yellow","white"],"yellow":"purple"}
+
+   h_mapping = ["neutral","red","green","blue","white"]
+   v_mapping = ["neutral","green","blue","white"]
    
-   endNode   = n*m#random.randint(1,n*m)
-   startNode = 3#random.randint(1,n*m)
+   endNode   = n*m
+   startNode = 3
    assert n*m > 3*len(ordering) # A reasonable assumption that will hopefully prevent an infinite loop
    assert 0 < endNode <= n*m
    assert 0 < startNode <= n*m
    assert startNode != endNode
-   level.makeMap(m,n,ordering,endNode,startNode,.5)
+   level.makeMap(m,n,ordering,h_mapping,v_mapping,endNode,startNode,.5)
    level.prepareMap()
 
    loadmenu = LoadMenu((SCREEN_SIZE[0]//2 - 250,SCREEN_SIZE[1]//2-150),
