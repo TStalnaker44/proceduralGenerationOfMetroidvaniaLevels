@@ -193,6 +193,7 @@ class LevelTester():
          rooms.append(edge[1])
       rooms = set(rooms)
 
+
       # Split the edges of the graph into two types
       # forward edges and backwards edges and create a
       # mapping between the two
@@ -207,6 +208,12 @@ class LevelTester():
             if y[0] == x[1] and y[1] == x[0]:
                backwardEdges.append(y)
                break
+            
+      # Enable backwards compatibility with older maps that
+      # weren't bidirectional
+      if type(self._g) != nx.DiGraph:
+         forwardEdges = [edge for edge in self._g.edges(data=True)]
+         backwardEdges = [(edge[1],edge[0],edge[2]) for edge in forwardEdges]
 
       # Add connections between rooms
       for i, edge in enumerate(forwardEdges):
