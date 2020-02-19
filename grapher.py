@@ -13,10 +13,17 @@ def tester():
 ##    ordering = {"red":["green","blue","purple"],"green":"orange",
 ##                "blue":"black","black":["pink","yellow","brown"],
 ##                "brown":"white"}
-    ordering = {"neutral":"grey","grey":["red","orange"],"red":"green","green":"blue",
-               "orange":["yellow","white"],"yellow":"purple"}
+    #ordering = {"neutral":"grey","grey":["red","orange"],"red":"green","green":"blue",
+    #           "orange":["yellow","white"],"yellow":"purple"}
+    ordering = {"red":["green","purple"],"green":"blue","purple":"yellow"}
+
+    for x in range(10):
+        getGateOrder(ordering)
+        
     g = createGraph(ordering)
     plot(g)
+
+
 
     print([x for x in nx.topological_sort(g)])
 
@@ -46,13 +53,29 @@ def createGraph(gates):
                 g.add_edge(key, gate)
         else:
             g.add_edge(key, gates[key])
-    #print(g.edges())
     return g
 
 def getGateOrder(ordering):
+    """Function that creates a viable ordering for the
+    provided keys given their ordering criteria"""
+    
     # Improve this with a better solution
     g = createGraph(ordering)
-    return [x for x in nx.topological_sort(g)]
+
+    # Find the start node
+    start = [node for node, degree in g.in_degree() if degree==0][0]
+    order, used = [start], [start]
+    possibleNext = []
+    
+    while len(order) < g.number_of_nodes():
+        for node in order:
+            for x in g.neighbors(node):
+                possibleNext.append(x)
+        posNex = random.choice(possibleNext)
+        if not posNex in order:
+            order.append(posNex)
+        
+    return order
 
 def getDirectionalMapping(mappings):
     ret = []
