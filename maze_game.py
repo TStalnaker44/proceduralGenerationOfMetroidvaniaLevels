@@ -17,8 +17,8 @@ from graphics import MySurface
 from loadmenu import LoadMenu
 from savemenu import SaveMenu
 
-n = 4#random.randint(4,10)#6
-m = 4#random.randint(4,10)#4
+n = 6#random.randint(4,10)#6
+m = 6#random.randint(4,10)#4
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (800,500)
@@ -64,9 +64,6 @@ class LevelTester():
       self._g = latticeCreator.generateViableMap(dimensions, self._gates, self._keys,
                                                  self._mappings, weightedNeutral, endNode,
                                                  startNode)
-
-      for edge in self._g.edges(data=True):
-         print(edge)
 
    def loadTemplate(self, fileName):
       """Create a new map from a saved template"""
@@ -124,12 +121,20 @@ class LevelTester():
          self._platforms       =  md._platforms
          self._physicalKeys    =  md._physicalKeys
          self._player          =  Avatar(md._playerStart)
+         self._backupKeys      = [k for k in self._physicalKeys]
+         for k in self._physicalKeys: k._collected = False
       self._finish.undoPickleSafe()
       for wall in self._walls: wall.undoPickleSafe()
       for plat in self._platforms: plat.undoPickleSafe()
       for key in self._physicalKeys: key.undoPickleSafe()
       self._won = False
-      
+
+   def restart(self):
+      self._player =  Avatar(self._playerStart)
+      self._physicalKeys = [k for k in self._backupKeys]
+      for k in self._physicalKeys:
+         k._collected = False
+      self._won = False
 
    def saveTemplate(self, fileName):
       """Save a map template to file"""
@@ -146,17 +151,17 @@ class LevelTester():
                    self._h_mapping, self._v_mapping)
       for wall in self._walls: wall.makePickleSafe()
       for platform in self._platforms: platform.makePickleSafe()
-      for key in self._physicalKeys: key.makePickleSafe()
+      for key in self._backupKeys: key.makePickleSafe()
       self._finish.makePickleSafe()
       gm = GeneratedMap(md, self._finish, self._walls, self._platforms,
-                        self._physicalKeys, self._playerStart)
+                        self._backupKeys, self._playerStart)
       with open(fileName, "wb") as pFile:
          pickle.dump(gm, pFile, protocol=pickle.HIGHEST_PROTOCOL)
 
       self._finish.undoPickleSafe()
       for wall in self._walls: wall.undoPickleSafe()
       for plat in self._platforms: plat.undoPickleSafe()
-      for key in self._physicalKeys: key.undoPickleSafe()
+      for key in self._backupKeys: key.undoPickleSafe()
 
    def newMap(self):
       """Create a new map using the current dimensions and gate ordering"""
@@ -328,6 +333,9 @@ class LevelTester():
              ((topCorner[1]*roomSize[1])+(roomSize[1]//4)) + startCoord[1] + barrierWidth//2)
       self._finish = MySurface(s, pos)
       self._finish._worldBound = True
+
+      # Back up the physical keys for restarting and saving
+      self._backupKeys = [k for k in self._physicalKeys]
       
 
    def draw(self, screen):
@@ -434,18 +442,18 @@ def main():
    avatar = Avatar((100,100))
 
    level = LevelTester(SCREEN_SIZE, WORLD_SIZE)
-##   ordering = {"neutral":["red","orange"],"red":"green",
-##               "orange":"grey","green":"blue","blue":"white",}
+   ordering = {"neutral":["red","orange"],"red":"green",
+               "orange":"grey","green":"blue","blue":"white",}
    #ordering = {"neutral":"grey","grey":["red","orange"],"red":"green","green":"blue",
    #            "orange":["yellow","white"],"yellow":"purple"}
 
-##   h_mapping = ["neutral",("red","blue"),"green","blue","white","grey"]
-##   v_mapping = ["neutral","red",("green","neutral"),"blue","white","grey",
-##                ("orange","blue")]
+   h_mapping = ["neutral",("red","blue"),"green","blue","white","grey"]
+   v_mapping = ["neutral","red",("green","neutral"),"blue","white","grey",
+                ("orange","blue")]
 
-   ordering = {"red":"green","green":"blue","blue":"white"}
-   h_mapping = [("red","green"),("green","red"),("red","blue"),"white"]
-   v_mapping = ["red",("green","red"),("blue","green"),"white"]
+##   ordering = {"red":"green","green":"blue","blue":"white"}
+##   h_mapping = [("red","green"),("green","red"),("red","blue"),"white"]
+##   v_mapping = ["red",("green","red"),("blue","green"),"white"]
    
    endNode   = n*m
    startNode = 1
@@ -519,6 +527,9 @@ def main():
                level.newMap()
                gameClock.tick() # effectively pauses the clock for
                gameClock.tick() # a reload
+            if event.key == pygame.K_r and \
+               event.mod & pygame.KMOD_CTRL:
+               level.restart()
 
          level.handleEvent(event)
 

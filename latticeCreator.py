@@ -158,8 +158,6 @@ def findExplorable(g, keys, startNode=1):
 
 def viableMap(dimensions, gates, keys, mappings, weightedNeutral=0, endNode=None, startNode=1):
 
-    print("-"*50)
-    
     if endNode == None:
         endNode = dimensions[0] * dimensions[1]
     
@@ -179,7 +177,6 @@ def viableMap(dimensions, gates, keys, mappings, weightedNeutral=0, endNode=None
     for x in range(0, len(gates)-1):
         previouslyExplorable = set(findExplorable(g, gates[:x], startNode))
         nowExplorable = set(findExplorable(g, gates[:x+1], startNode))
-        print(nowExplorable)
         newAreas = list(nowExplorable - previouslyExplorable)
         if len(newAreas) == 0:
             return False
@@ -198,14 +195,15 @@ def viableMap(dimensions, gates, keys, mappings, weightedNeutral=0, endNode=None
         # a potential byproduct of the bidirectional structure
         keyLocation = random.choice(newAreas)
 
-
         # Create a temporary graph that only contains traversible edges
         g_temp = nx.DiGraph()
         for e in g.edges(data=True):
             if e[2]["object"] in gates[:x+1]:
                 g_temp.add_edge(e[0],e[1],object=e[2]["object"])
-         
-        for node in newAreas:
+
+        # Look through all of the new areas and the room
+        # that contained the last key
+        for node in set(newAreas + [keys[gates[x]]]):
  
             # Check that a connection of some form exists
             if not nx.has_path(g_temp, node, keyLocation):
@@ -264,8 +262,6 @@ def main():
                 break
         else:
             color_map.append("grey")
-
-    print(gates)
 
     #Display the graph
     pos = nx.spring_layout(g)
