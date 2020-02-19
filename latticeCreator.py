@@ -158,6 +158,8 @@ def findExplorable(g, keys, startNode=1):
 
 def viableMap(dimensions, gates, keys, mappings, weightedNeutral=0, endNode=None, startNode=1):
 
+    print("-"*50)
+    
     if endNode == None:
         endNode = dimensions[0] * dimensions[1]
     
@@ -177,6 +179,7 @@ def viableMap(dimensions, gates, keys, mappings, weightedNeutral=0, endNode=None
     for x in range(0, len(gates)-1):
         previouslyExplorable = set(findExplorable(g, gates[:x], startNode))
         nowExplorable = set(findExplorable(g, gates[:x+1], startNode))
+        print(nowExplorable)
         newAreas = list(nowExplorable - previouslyExplorable)
         if len(newAreas) == 0:
             return False
@@ -185,7 +188,6 @@ def viableMap(dimensions, gates, keys, mappings, weightedNeutral=0, endNode=None
     primary_edges = ([e for e in g.edges(data=True) if e[2]['object']==gates[0]])
     
     # Place keys into the map
-    oldNewAreas = None
     for x in range(0, len(gates)-1):
         previouslyExplorable = set(findExplorable(g, gates[:x], startNode))
         nowExplorable = set(findExplorable(g, gates[:x+1], startNode))
@@ -195,17 +197,20 @@ def viableMap(dimensions, gates, keys, mappings, weightedNeutral=0, endNode=None
         # That is, prevent there from being inescapable pits in the map,
         # a potential byproduct of the bidirectional structure
         keyLocation = random.choice(newAreas)
-        # Look only at the newest nodes
-        for node in nowExplorable:
+
+
+        # Create a temporary graph that only contains traversible edges
+        g_temp = nx.DiGraph()
+        for e in g.edges(data=True):
+            if e[2]["object"] in gates[:x+1]:
+                g_temp.add_edge(e[0],e[1],object=e[2]["object"])
+         
+        for node in newAreas:
+ 
             # Check that a connection of some form exists
-            if nx.has_path(g, node, keyLocation):
-                try:
-                    # Check that there is a connection obeying the gating rules
-                    weight = lambda u, v, d: 1 if d['object'] in gates[:x+1] else None
-                    nx.bidirectional_dijkstra(g,node,keyLocation,weight)
-                except:
-                    # If no such path exists, this isn't a viable map
-                    return False
+            if not nx.has_path(g_temp, node, keyLocation):
+                return False
+            
         # Place the key at the given, approved node
         keys[gates[x+1]] = keyLocation
 

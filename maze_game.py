@@ -65,6 +65,9 @@ class LevelTester():
                                                  self._mappings, weightedNeutral, endNode,
                                                  startNode)
 
+      for edge in self._g.edges(data=True):
+         print(edge)
+
    def loadTemplate(self, fileName):
       """Create a new map from a saved template"""
       with open(fileName, "rb") as pFile:
@@ -431,15 +434,21 @@ def main():
    avatar = Avatar((100,100))
 
    level = LevelTester(SCREEN_SIZE, WORLD_SIZE)
-   ordering = {"neutral":"red","red":"green","green":"blue","blue":"white",}
+##   ordering = {"neutral":["red","orange"],"red":"green",
+##               "orange":"grey","green":"blue","blue":"white",}
    #ordering = {"neutral":"grey","grey":["red","orange"],"red":"green","green":"blue",
    #            "orange":["yellow","white"],"yellow":"purple"}
 
-   h_mapping = ["neutral",("red","blue"),"green","blue","white"]
-   v_mapping = ["neutral","red",("green","neutral"),"blue","white"]
+##   h_mapping = ["neutral",("red","blue"),"green","blue","white","grey"]
+##   v_mapping = ["neutral","red",("green","neutral"),"blue","white","grey",
+##                ("orange","blue")]
+
+   ordering = {"red":"green","green":"blue","blue":"white"}
+   h_mapping = [("red","green"),("green","red"),("red","blue"),"white"]
+   v_mapping = ["red",("green","red"),("blue","green"),"white"]
    
    endNode   = n*m
-   startNode = 3
+   startNode = 1
    assert n*m > 3*len(ordering) # A reasonable assumption that will hopefully prevent an infinite loop
    assert 0 < endNode <= n*m
    assert 0 < startNode <= n*m

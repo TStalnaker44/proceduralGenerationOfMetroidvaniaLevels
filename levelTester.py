@@ -231,14 +231,21 @@ def main():
    
    #Create the Level Tester object
    level = LevelTester(SCREEN_SIZE)
-   ordering = {"red":"green","green":["blue","orange"],"blue":"white","orange":"grey"}
-   #ordering = {"grey":["red","orange"],"red":"green","green":"blue",
-   #            "orange":["yellow","white"],"yellow":"purple"}
+##   ordering = {"red":"green","green":["blue","orange"],"blue":"white","orange":"grey"}
+##   #ordering = {"grey":["red","orange"],"red":"green","green":"blue",
+##   #            "orange":["yellow","white"],"yellow":"purple"}
+##
+##   # The starter gate type and all potential end types need to be included in these lists,
+##   # otherwise a crash could occur
+##   h_mapping = ["red",("blue", "green"),"blue","white","grey"]
+##   v_mapping = ["red",("green","blue"),"orange","white","grey"]
 
-   # The starter gate type and all potential end types need to be included in these lists,
-   # otherwise a crash could occur
-   h_mapping = ["red",("blue", "green"),"blue","white","grey"]
-   v_mapping = ["red",("green","blue"),"orange","white","grey"]
+   ordering = {"pink":["red","orange"],"red":"green",
+               "orange":"grey","green":"blue","blue":"white",}
+   h_mapping = ["pink",("red","blue"),"green","blue","white","grey"]
+   v_mapping = ["pink","red",("green","pink"),"blue","white","grey",
+                ("orange","blue")]
+   
    endNode   = n*m
    startNode = 1
    assert 0 < endNode <= n*m

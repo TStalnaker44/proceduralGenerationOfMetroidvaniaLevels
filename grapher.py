@@ -50,6 +50,7 @@ def createGraph(gates):
     return g
 
 def getGateOrder(ordering):
+    # Improve this with a better solution
     g = createGraph(ordering)
     return [x for x in nx.topological_sort(g)]
 
