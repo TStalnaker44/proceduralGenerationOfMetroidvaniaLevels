@@ -411,7 +411,10 @@ class LevelTester():
       for node in self._g:
           for gate in self._gates:
               if self._keys[gate] == node and gate in self._colors.keys():
-                  color_map.append(gate)
+                  if gate in ["double_jump","shrink"]:
+                     color_map.append("grey")
+                  else:
+                     color_map.append(gate)
                   break
           else:
               color_map.append("grey")

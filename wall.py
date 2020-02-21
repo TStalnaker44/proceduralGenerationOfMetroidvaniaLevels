@@ -74,6 +74,7 @@ class Wall(Barrier):
                                          direction=1, #Set to have a horizontal direction
                                          size=(size[0],platformWidth)))
 
+        # Create a wall with a small gate at the bottom
         elif connectionType == ("shrink","shrink"):
             # Create the top portion of the wall
             self._components.append(
