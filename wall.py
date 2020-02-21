@@ -45,10 +45,39 @@ class Wall(Barrier):
         if connectionType == 0:
             self._components.append(Gate(self._position, self._neutral,
                                          99, size=size))
+        # Add a double jump gate
+        elif connectionType == ("double_jump","double_jump"):
+            topHeight = size[1] - ((3 * standardUnit) + size[0])
+            bottomHeight = size[0] + (standardUnit*2)
+            platformWidth = (2 * standardUnit) + size[0]
+            platformPos = ((self._position[0] - (platformWidth//2)) + (size[0]//2),
+                           self._position[1]+topHeight+gateHeight)
+
+            # Create the top wall component
+            if connectionType != "neutral" or random.random() > .5:
+                self._components.append(Gate(self._position,
+                                             self._neutral,
+                                             99,
+                                             size=(size[0],topHeight)
+                                             ))
+
+            # Add the bottom floor level piece, used to make map corners look nice
+            self._components.append(Gate((self._position[0],self._position[1]+topHeight+gateHeight),
+                                         self._neutral,
+                                         99,
+                                         size=(size[0],bottomHeight)))
+
+            # Add the platform for the player to land on
+            self._components.append(Gate(platformPos,
+                                         self._neutral,
+                                         99,
+                                         direction=1, #Set to have a horizontal direction
+                                         size=(size[0],platformWidth)))
+            
         # Add a wall with some sort of a gate
         else:
             
-            variant = 2#random.randint(1,2)
+            variant = random.randint(1,2)
                 
             # Create a wall with the gate entrance at ground level
             if variant == 1:

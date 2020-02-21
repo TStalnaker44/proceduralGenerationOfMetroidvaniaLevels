@@ -446,7 +446,7 @@ def main():
    ordering = {"neutral":["red","orange"],"red":"double_jump",
                "orange":"grey","double_jump":"blue","blue":"white",}
 
-   h_mapping = ["neutral",("red","blue"),"blue","white","grey"]
+   h_mapping = ["neutral",("red","blue"),"blue","white","grey","double_jump"]
    v_mapping = ["neutral","red",("double_jump","neutral"),"blue","white","grey",
                 ("orange","blue")]
    
