@@ -45,6 +45,22 @@ class LevelTester():
       self._ordering        = None
       self._startNode       = None
       self._weightedNeutral = None
+      self._showMiniMap     = False
+
+      # Create a standard unit for creation of map
+      self._u = Avatar((0,0)).getHeight()*1.5
+
+      # Dimensions of the rooms in the world
+      self._roomHeight = 6 * self._u # 6 standard units
+      self._roomWidth = 15 * self._u # 15 standard units
+
+      # Dimensions of the rooms on the minimap
+      self._miniRoomWidth = 50
+      self._miniRoomHeight = 30
+
+      temp = pygame.Surface((10,10))
+      temp.fill((0,0,0))
+      self._pointer = MySurface(temp, (0,0))
 
    def makeMap(self, m, n, ordering, h_mapping, v_mapping,
                endNode, startNode=1, weightedNeutral=0.5):
@@ -129,6 +145,7 @@ class LevelTester():
       for plat in self._platforms: plat.undoPickleSafe()
       for key in self._physicalKeys: key.undoPickleSafe()
       self._won = False
+      self._miniMap = self.createMiniMap()
 
    def restart(self):
       """Restart the current map"""
@@ -172,18 +189,64 @@ class LevelTester():
       self.prepareMap()
       self._won = False
 
+   def createMiniMap(self):
+
+      startCoords = (20, self._SCREEN_SIZE[1]-(self._miniRoomHeight*(self._n+1)))
+
+      # Get the top corners for each position in the grid
+      topCorners = []
+      for y in range(self._m):
+         for x in range(self._n):
+            topCorners.append((x,y))
+
+      # Get all of the distinct rooms in the map
+      rooms = []
+      for edge in self._g.edges():
+         rooms.append(edge[0])
+         rooms.append(edge[1])
+      rooms = set(rooms)
+
+      miniRooms = []
+      for r in rooms:
+         tempSurf = pygame.Surface((self._miniRoomWidth, self._miniRoomHeight))
+         if r == self._endNode:
+            tempSurf.fill((135,206,250))
+         elif r == self._startNode:
+            tempSurf.fill((0,255,0))
+         else:
+            tempSurf.fill((255,255,255))
+         x,y = topCorners[r-1]
+         pos = ((x * (self._miniRoomWidth+2)) + startCoords[0],
+                (y * (self._miniRoomHeight+2)) + startCoords[1])
+         miniRooms.append(MySurface(tempSurf, pos))
+
+      return miniRooms
+
+   def updateMiniMap(self):
+      play_x = ((self._player.getX() + (self._player.getWidth()//2) - 100) * \
+                (self._miniRoomWidth / (self._roomWidth))) + 20
+      play_y = ((self._player.getY() + self._player.getHeight() - 100) * \
+                (self._miniRoomHeight / (self._roomHeight))) + \
+               self._SCREEN_SIZE[1]-(self._miniRoomHeight*(self._n+1))
+      for room in self._miniMap:
+         if room.getCollideRect().collidepoint((play_x, play_y)):
+            posx = room.getX() + (room.getWidth()//2) - (self._pointer.getWidth()//2)
+            posy = room.getY() + (room.getHeight()//2) - (self._pointer.getHeight()//2)
+            self._pointer.setPosition((posx,posy))
+      
+
    def prepareMap(self):
       """Prepare the graphical / displayed components of the level"""
 
       # Create a standard unit for creation of map
-      u = Avatar((0,0)).getHeight()*1.5
+      u = self._u
 
       # Initialize visual attributes
       self._walls = []
       self._platforms = []
       self._physicalKeys = []
-      roomHeight = 6 * u # 4 standard units
-      roomWidth = 15 * u # 10 standard units
+      roomHeight = self._roomHeight
+      roomWidth = self._roomWidth
       roomSize = (roomWidth, roomHeight)
       barrierWidth = (1/4) * u
       wallSize = (barrierWidth, roomHeight + barrierWidth)
@@ -338,8 +401,9 @@ class LevelTester():
 
       # Back up the physical keys for restarting and saving
       self._backupKeys = [k for k in self._physicalKeys]
-      
 
+      self._miniMap = self.createMiniMap()
+      
    def draw(self, screen):
       """Draw the level to the screen"""
 
@@ -373,6 +437,11 @@ class LevelTester():
          screen.blit(self._font.render("You Have Won", False, (0,0,0)),
                      (self._SCREEN_SIZE[0]//2,self._SCREEN_SIZE[1]//2))
 
+      if self._showMiniMap:
+         for room in self._miniMap:
+            room.draw(screen)
+         self._pointer.draw(screen)
+
    def handleEvent(self, event):
       """Handle events for the level"""
 
@@ -403,6 +472,8 @@ class LevelTester():
       # End the game when the player reaches the end node
       if self._player.getCollideRect().colliderect(self._finish.getCollideRect()):
          self._won = True
+
+      self.updateMiniMap()
 
    def plot(self):
       """Generate a network x plot for the level"""
@@ -528,6 +599,8 @@ def main():
             if event.key == pygame.K_r and \
                event.mod & pygame.KMOD_CTRL:
                level.restart()
+            if event.key == pygame.K_m:
+               level._showMiniMap = not level._showMiniMap
 
          level.handleEvent(event)
 
