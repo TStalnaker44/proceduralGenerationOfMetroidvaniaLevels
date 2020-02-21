@@ -17,8 +17,8 @@ from graphics import MySurface
 from loadmenu import LoadMenu
 from savemenu import SaveMenu
 
-n = 6#random.randint(4,10)#6
-m = 6#random.randint(4,10)#4
+n = 5#random.randint(4,10)#6
+m = 5#random.randint(4,10)#4
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (800,500)
@@ -30,7 +30,8 @@ class LevelTester():
       self._font = pygame.font.SysFont("Times New Roman", 32)
       self._colors = {"grey":(80,80,80),"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
              "orange":(255,165,0),"white":(255,255,255),"brown":(160,82,45),
-             "purple":(128,0,128), "pink":(255,192,203),"yellow":(255,255,0)}
+             "purple":(128,0,128), "pink":(255,192,203),"yellow":(255,255,0),
+             "double_jump":(255,97,50)}
       self._SCREEN_SIZE = screen_size
       self._WORLD_SIZE = world_size
       self._won             = False
@@ -130,6 +131,7 @@ class LevelTester():
       self._won = False
 
    def restart(self):
+      """Restart the current map"""
       self._player =  Avatar(self._playerStart)
       self._physicalKeys = [k for k in self._backupKeys]
       for k in self._physicalKeys:
@@ -180,8 +182,8 @@ class LevelTester():
       self._walls = []
       self._platforms = []
       self._physicalKeys = []
-      roomHeight = 4 * u # 4 standard units
-      roomWidth = 10 * u # 10 standard units
+      roomHeight = 6 * u # 4 standard units
+      roomWidth = 15 * u # 10 standard units
       roomSize = (roomWidth, roomHeight)
       barrierWidth = (1/4) * u
       wallSize = (barrierWidth, roomHeight + barrierWidth)
@@ -308,7 +310,7 @@ class LevelTester():
          keyColor = self._colors.get(keyType, None)
          rCoord = topCorners[self._keys[key]-1]
          midCoord = (((rCoord[0]*roomSize[0]) + roomSize[0]//2)+startCoord[0],
-                     ((rCoord[1]*roomSize[1]) + roomSize[1]//2)+startCoord[1])
+                     ((rCoord[1]*roomSize[1]) + (roomSize[1] - (u*1.75)))+startCoord[1])
          if key != "neutral":
             self._physicalKeys.append(Key(midCoord, keyColor, keyType))
 
@@ -439,21 +441,14 @@ def main():
    #Get the screen
    screen = pygame.display.set_mode(SCREEN_SIZE)
 
-   avatar = Avatar((100,100))
-
    level = LevelTester(SCREEN_SIZE, WORLD_SIZE)
-   ordering = {"neutral":["red","orange"],"red":"green",
-               "orange":"grey","green":"blue","blue":"white",}
-   #ordering = {"neutral":"grey","grey":["red","orange"],"red":"green","green":"blue",
-   #            "orange":["yellow","white"],"yellow":"purple"}
+   
+   ordering = {"neutral":["red","orange"],"red":"double_jump",
+               "orange":"grey","double_jump":"blue","blue":"white",}
 
-   h_mapping = ["neutral",("red","blue"),"green","blue","white","grey"]
-   v_mapping = ["neutral","red",("green","neutral"),"blue","white","grey",
+   h_mapping = ["neutral",("red","blue"),"blue","white","grey"]
+   v_mapping = ["neutral","red",("double_jump","neutral"),"blue","white","grey",
                 ("orange","blue")]
-
-##   ordering = {"red":"green","green":"blue","blue":"white"}
-##   h_mapping = [("red","green"),("green","red"),("red","blue"),"white"]
-##   v_mapping = ["red",("green","red"),("blue","green"),"white"]
    
    endNode   = n*m
    startNode = 1

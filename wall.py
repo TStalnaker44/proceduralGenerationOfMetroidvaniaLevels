@@ -193,7 +193,7 @@ class Platform(Barrier):
                 size=(size[0],leftEdgeLength)))
 
             # Create the upper gate component
-            if connectionType[0] != "neutral": 
+            if not connectionType[0] in ["neutral"]: 
                 # Create the gated opening
                 self._components.append(Gate(
                     (self._position[0]+leftEdgeLength,self._position[1]),
@@ -204,7 +204,7 @@ class Platform(Barrier):
                     passThrough=(True,False,False,False)))
 
             # Create the lower gate component
-            if connectionType[1] != "neutral": 
+            if not connectionType[1] in ["neutral","double_jump"]: 
                 # Create the gated opening
                 self._components.append(Gate(
                     (self._position[0]+leftEdgeLength,self._position[1]+(size[0]//2)),
@@ -223,7 +223,15 @@ class Platform(Barrier):
                 size=(size[0],rightEdgeLength)))
 
             # Create the middle platforms
-            for x in range(1, int(roomHeight//standardUnit)):
+            if connectionType[1] == "double_jump":
+                numOfPlatforms = int(roomHeight//(standardUnit*1.25))
+                step = 2
+                start = 2
+            else:
+                numOfPlatforms = int(roomHeight//standardUnit)
+                step = 1
+                start = 1
+            for x in range(start, numOfPlatforms, step):
                 length = random.randint(midplatformLength-(size[1]//8),
                                         midplatformLength+(size[1]//8))
                 midplatformXPos = self._position[0] + ((size[1] // 2) - (length // 2)) + \
