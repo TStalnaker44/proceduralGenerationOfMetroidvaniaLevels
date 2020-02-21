@@ -31,7 +31,7 @@ class LevelTester():
       self._colors = {"grey":(80,80,80),"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
              "orange":(255,165,0),"white":(255,255,255),"brown":(160,82,45),
              "purple":(128,0,128), "pink":(255,192,203),"yellow":(255,255,0),
-             "double_jump":(255,97,50)}
+             "double_jump":(255,97,50),"shrink":(120,120,45)}
       self._SCREEN_SIZE = screen_size
       self._WORLD_SIZE = world_size
       self._won             = False
@@ -443,11 +443,11 @@ def main():
 
    level = LevelTester(SCREEN_SIZE, WORLD_SIZE)
    
-   ordering = {"neutral":["red","orange"],"red":"double_jump",
+   ordering = {"neutral":["shrink","orange"],"shrink":"double_jump",
                "orange":"grey","double_jump":"blue","blue":"white",}
 
-   h_mapping = ["neutral",("red","blue"),"blue","white","grey","double_jump"]
-   v_mapping = ["neutral","red",("double_jump","neutral"),"blue","white","grey",
+   h_mapping = ["neutral","shrink","blue","white","grey","double_jump"]
+   v_mapping = ["neutral",("double_jump","neutral"),"blue","white","grey",
                 ("orange","blue")]
    
    endNode   = n*m

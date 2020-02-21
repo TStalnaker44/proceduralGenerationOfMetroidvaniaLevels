@@ -73,6 +73,24 @@ class Wall(Barrier):
                                          99,
                                          direction=1, #Set to have a horizontal direction
                                          size=(size[0],platformWidth)))
+
+        elif connectionType == ("shrink","shrink"):
+            # Create the top portion of the wall
+            self._components.append(
+                    Gate(self._position, #start at position provided to the wall
+                         self._neutral, #neutral (grey) coloring
+                         99, #key type is 99, ie doesn't exist
+                         # The height of the wall is the height of the total wall minus
+                         # the height of the gate and the width of the map's walls,
+                         # this prevents the gate entrance from being partially embedded
+                         # in the ground
+                         size=(size[0],size[1]-((gateHeight//2) + size[0])) 
+                         )
+                    )
+
+            # Add the bottom floor level piece, used to make map corners look nice
+            self._components.append(Gate((self._position[0],self._position[1]+(size[1]-size[0])),
+                                          self._neutral, 99, size=(size[0],size[0])))
             
         # Add a wall with some sort of a gate
         else:
