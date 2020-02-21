@@ -50,6 +50,8 @@ class Avatar(Drawable):
         self._gravity = 2
         self._friction = 0.3
         self._jumpPower = 125
+
+        self._shrunk = False
         
     def getKeys(self):
         return self._keys
@@ -71,9 +73,19 @@ class Avatar(Drawable):
                 self._jumpCount += 1
                 
             elif (self._fsm.getCurrentState() == "jumping") and \
-                 self._jumpCount < 2:
+                 self._jumpCount < 2 and \
+                 "double_jump" in self._keys:
                 self._jumpTimer = self._jumpTime
                 self._jumpCount += 1
+
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+            if "shrink" in self._keys:
+                if self._shrunk:
+                    self._position.y -= self.getHeight()
+                    self.scale(2)
+                else:
+                    self.scale(0.5)
+                self._shrunk = not self._shrunk
                 
         if event.type == pygame.KEYDOWN:
             self._movement[event.key] = True
