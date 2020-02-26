@@ -29,7 +29,8 @@ def detConnection(g, i, node, nodes, nodeStack, completedNodes, gates,
 
         if i == endNode or node == endNode:
             gateTech = gates[-1]
-                
+
+        # Check if the connection should be added 
         if r():
             
             # Create bi-directional connections between the two nodes
