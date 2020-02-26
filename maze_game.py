@@ -21,12 +21,12 @@ n = 6#random.randint(4,10)#6
 m = 6#random.randint(4,10)#4
 
 # Dynamically determine screen size based on grid size
-SCREEN_SIZE = (800,500)
+SCREEN_SIZE = (1000,625)
 WORLD_SIZE = (10000,10000)
 
 class LevelTester():
 
-   def __init__(self, screen_size, world_size):
+   def __init__(self, screen_size, world_size, roomDims):
       self._font = pygame.font.SysFont("Times New Roman", 32)
       self._colors = {"grey":(80,80,80),"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
              "orange":(255,165,0),"white":(255,255,255),"brown":(160,82,45),
@@ -53,8 +53,8 @@ class LevelTester():
       self._u = Avatar((0,0)).getHeight()*1.5
 
       # Dimensions of the rooms in the world
-      self._roomHeight = 6 * self._u # 6 standard units
-      self._roomWidth = 15 * self._u # 15 standard units
+      self._roomHeight = roomDims[1] * self._u #standard units
+      self._roomWidth = roomDims[0] * self._u #standard units
 
       # Dimensions of the rooms on the minimap
       self._miniRoomWidth = 50
@@ -209,6 +209,7 @@ class LevelTester():
       self._won = False
 
    def createMiniMap(self):
+      """Create a minimap for the player"""
 
       startCoords = (20, self._SCREEN_SIZE[1]-(self._miniRoomHeight*(self._m+1)))
 
@@ -242,6 +243,7 @@ class LevelTester():
       return miniRooms
 
    def updateMiniMap(self):
+      """Update the player's position on the minimap"""
       play_x = ((self._player.getX() + (self._player.getWidth()//2) - 100) * \
                 (self._miniRoomWidth / (self._roomWidth))) + 20
       play_y = ((self._player.getY() + self._player.getHeight() - 100) * \
@@ -456,6 +458,7 @@ class LevelTester():
          screen.blit(self._font.render("You Have Won", False, (0,0,0)),
                      (self._SCREEN_SIZE[0]//2,self._SCREEN_SIZE[1]//2))
 
+      # Draw the minimap to the screen if it should be displayed
       if self._showMiniMap:
          for room in self._miniMap:
             room.draw(screen)
@@ -492,6 +495,7 @@ class LevelTester():
       if self._player.getCollideRect().colliderect(self._finish.getCollideRect()):
          self._won = True
 
+      # Update the minimap
       self.updateMiniMap()
 
    def plot(self):
@@ -534,7 +538,9 @@ def main():
    #Get the screen
    screen = pygame.display.set_mode(SCREEN_SIZE)
 
-   level = LevelTester(SCREEN_SIZE, WORLD_SIZE)
+   roomDimensions = (18,6) # in units u
+
+   level = LevelTester(SCREEN_SIZE, WORLD_SIZE, roomDimensions)
    
    ordering = {"neutral":["shrink","orange"],"shrink":"double_jump",
                "orange":"grey","double_jump":"blue","blue":"white",}
