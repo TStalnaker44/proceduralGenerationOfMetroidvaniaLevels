@@ -647,10 +647,12 @@ def main():
             if event.key == pygame.K_r and \
                event.mod & pygame.KMOD_CTRL:
                level.restart()
-            if event.key == pygame.K_m:
+            if event.key == pygame.K_m and not loadmenu.getDisplay() and \
+               not savemenu.getDisplay():
                level._showMiniMap = not level._showMiniMap
 
-         level.handleEvent(event)
+         if not loadmenu.getDisplay() and not savemenu.getDisplay():
+            level.handleEvent(event)
 
          if loadmenu.getDisplay():
             sel = loadmenu.handleEvent(event)
