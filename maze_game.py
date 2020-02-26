@@ -17,8 +17,8 @@ from graphics import MySurface
 from loadmenu import LoadMenu
 from savemenu import SaveMenu
 
-n = 5#random.randint(4,10)#6
-m = 5#random.randint(4,10)#4
+n = 6#random.randint(4,10)#6
+m = 6#random.randint(4,10)#4
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (800,500)
@@ -46,6 +46,8 @@ class LevelTester():
       self._startNode       = None
       self._weightedNeutral = None
       self._showMiniMap     = False
+
+      ## Variables used in the creation of the minimap
 
       # Create a standard unit for creation of map
       self._u = Avatar((0,0)).getHeight()*1.5
@@ -111,7 +113,10 @@ class LevelTester():
             self._h_mapping = grapher.getDirectionalMapping(md._ordering)
             self._v_mapping = grapher.getDirectionalMapping(md._ordering)
 
+      # Prepare a map with the above settings
       self.prepareMap()
+
+      # Set the game state to unwon
       self._won = False
 
    def loadMap(self, fileName):
@@ -140,11 +145,25 @@ class LevelTester():
          self._player          =  Avatar(md._playerStart)
          self._backupKeys      = [k for k in self._physicalKeys]
          for k in self._physicalKeys: k._collected = False
+
+      # Convert the drawable objects back to a drawable form
       self._finish.undoPickleSafe()
       for wall in self._walls: wall.undoPickleSafe()
       for plat in self._platforms: plat.undoPickleSafe()
       for key in self._physicalKeys: key.undoPickleSafe()
+      
+      # Separate the platforms and walls into their components (for collision detection)
+      self._platformParts = []
+      for p in self._platforms:
+         self._platformParts.extend(p.getComponents())
+      self._wallParts = []
+      for w in self._walls:
+         self._wallParts.extend(w.getComponents())
+
+      # Set the game state to unwon
       self._won = False
+
+      # Create a crude minimap of the world
       self._miniMap = self.createMiniMap()
 
    def restart(self):
@@ -191,7 +210,7 @@ class LevelTester():
 
    def createMiniMap(self):
 
-      startCoords = (20, self._SCREEN_SIZE[1]-(self._miniRoomHeight*(self._n+1)))
+      startCoords = (20, self._SCREEN_SIZE[1]-(self._miniRoomHeight*(self._m+1)))
 
       # Get the top corners for each position in the grid
       topCorners = []
@@ -227,7 +246,7 @@ class LevelTester():
                 (self._miniRoomWidth / (self._roomWidth))) + 20
       play_y = ((self._player.getY() + self._player.getHeight() - 100) * \
                 (self._miniRoomHeight / (self._roomHeight))) + \
-               self._SCREEN_SIZE[1]-(self._miniRoomHeight*(self._n+1))
+               self._SCREEN_SIZE[1]-(self._miniRoomHeight*(self._m+1))
       for room in self._miniMap:
          if room.getCollideRect().collidepoint((play_x, play_y)):
             posx = room.getX() + (room.getWidth()//2) - (self._pointer.getWidth()//2)

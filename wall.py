@@ -29,6 +29,7 @@ class Wall(Barrier):
 
     def __init__(self, pos, connectionType, color=None,
                  size=(10,120), standardUnit=None):
+        
         # Save the position of the wall component
         self._position = pos
         
