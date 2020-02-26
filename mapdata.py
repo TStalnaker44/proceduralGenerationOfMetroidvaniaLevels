@@ -24,11 +24,12 @@ class GeneratedMap():
     map in the platforming view of the game."""
 
     def __init__(self, templateData, finish, walls, platforms, physicalKeys,
-                 playerStart):
+                 playerStart, roomDims):
         self._templateData = templateData
         self._finish = finish
         self._walls = walls
         self._platforms = platforms
         self._physicalKeys = physicalKeys
         self._playerStart = playerStart
+        self._roomDims = roomDims
         

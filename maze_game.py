@@ -51,6 +51,7 @@ class LevelTester():
 
       # Create a standard unit for creation of map
       self._u = Avatar((0,0)).getHeight()*1.5
+      print(self._u)
 
       # Dimensions of the rooms in the world
       self._roomHeight = roomDims[1] * self._u #standard units
@@ -144,6 +145,12 @@ class LevelTester():
          self._physicalKeys    =  md._physicalKeys
          self._player          =  Avatar(md._playerStart)
          self._backupKeys      = [k for k in self._physicalKeys]
+         try:
+            self._roomHeight   = md._roomDims[1]
+            self._roomWidth    = md._roomDims[0]
+         except:
+            self._roomHeight = None
+            self._roomWidth  = None
          for k in self._physicalKeys: k._collected = False
 
       # Convert the drawable objects back to a drawable form
@@ -151,6 +158,21 @@ class LevelTester():
       for wall in self._walls: wall.undoPickleSafe()
       for plat in self._platforms: plat.undoPickleSafe()
       for key in self._physicalKeys: key.undoPickleSafe()
+
+      # If the saved map predates the saving of room dimension info,
+      # extract that information from the physical platforms
+      # (Used for making the minimap function properly)
+      if self._roomHeight == None:
+         for wall in self._walls:
+            if wall._type == 0:
+               self._roomHeight = wall.getComponents()[0].getHeight()
+               break
+         print(self._roomHeight)
+         for platform in self._platforms:
+            if platform._type == 0:
+               self._roomWidth  = platform.getComponents()[0].getWidth()
+               break
+         print(self._roomWidth)
       
       # Separate the platforms and walls into their components (for collision detection)
       self._platformParts = []
@@ -192,7 +214,8 @@ class LevelTester():
       for key in self._backupKeys: key.makePickleSafe()
       self._finish.makePickleSafe()
       gm = GeneratedMap(md, self._finish, self._walls, self._platforms,
-                        self._backupKeys, self._playerStart)
+                        self._backupKeys, self._playerStart,
+                        (self._roomWidth,self._roomHeight))
       with open(fileName, "wb") as pFile:
          pickle.dump(gm, pFile, protocol=pickle.HIGHEST_PROTOCOL)
 
