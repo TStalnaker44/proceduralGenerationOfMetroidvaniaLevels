@@ -5,8 +5,8 @@ File: maze_avatar.py
 
 from modules.drawable import Drawable
 from modules.vector2D import Vector2
-from gate import Gate
-from fsm import *
+from .gate import Gate
+from .fsm import *
 import pygame
 
 class Avatar(Drawable):

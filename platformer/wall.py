@@ -1,6 +1,6 @@
 
 import pygame, random
-from gate import Gate
+from .gate import Gate
 from graphics.mysurface import MySurface
 
 class Barrier():

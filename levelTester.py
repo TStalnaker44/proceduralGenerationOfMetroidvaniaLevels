@@ -6,11 +6,13 @@ Description:
     metroidvannia style mappings
 """
 
-import pygame, latticeCreator, grapher, copy, random, pickle, glob
-from room import Room
-from room import Connector
+import pygame, copy, random, pickle, glob
+import graph_generation.latticeCreator as latticeCreator
+import graph_generation.grapher as grapher
+from demo.room import Room
+from demo.room import Connector
 from mapdata import MapData
-from player import Player
+from demo.player import Player
 import networkx as nx
 import matplotlib.pyplot as plt
 from graphics import *

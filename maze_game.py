@@ -5,20 +5,17 @@ File: maze_game.py
 
 import pygame, pickle, glob, random
 from mapdata import MapData, GeneratedMap
-from key import Key
-from gate import Gate
-from maze_avatar import Avatar
-from wall import Wall, Platform
-from key import Key
+from platformer.key import Key
+from platformer.gate import Gate
+from platformer.avatar import Avatar
+from platformer.wall import Wall, Platform
+from platformer.key import Key
 import networkx as nx
 import matplotlib.pyplot as plt
-##import grapher, latticeCreator
 import graph_generation.grapher as grapher
 import graph_generation.latticeCreator as latticeCreator
 from graphics import MySurface
-#from loadmenu import LoadMenu
-#from savemenu import SaveMenu
-from menu import Menu
+from platformer.menu import Menu
 
 n = 6#random.randint(4,10)#6
 m = 6#random.randint(4,10)#4
