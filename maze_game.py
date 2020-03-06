@@ -12,10 +12,13 @@ from wall import Wall, Platform
 from key import Key
 import networkx as nx
 import matplotlib.pyplot as plt
-import grapher, latticeCreator
+##import grapher, latticeCreator
+import graph_generation.grapher as grapher
+import graph_generation.latticeCreator as latticeCreator
 from graphics import MySurface
-from loadmenu import LoadMenu
-from savemenu import SaveMenu
+#from loadmenu import LoadMenu
+#from savemenu import SaveMenu
+from menu import Menu
 
 n = 6#random.randint(4,10)#6
 m = 6#random.randint(4,10)#4
@@ -581,12 +584,12 @@ def main():
    level.makeMap(m,n,ordering,h_mapping,v_mapping,endNode,startNode,.5)
    level.prepareMap()
 
-   loadmenu = LoadMenu((SCREEN_SIZE[0]//2 - 250,SCREEN_SIZE[1]//2-150),
-                       (500,300))
+   loadmenu = Menu((SCREEN_SIZE[0]//2 - 250,SCREEN_SIZE[1]//2-150),
+                       (500,300), "Load")
    loadmenu.close()
 
-   savemenu = SaveMenu((SCREEN_SIZE[0]//2 - 250,SCREEN_SIZE[1]//2-150),
-                       (500,300))
+   savemenu = Menu((SCREEN_SIZE[0]//2 - 250,SCREEN_SIZE[1]//2-150),
+                       (500,300), "Save")
    savemenu.close()
 
    # Create the game clock after all of the preprocessing is done
@@ -647,10 +650,12 @@ def main():
             if event.key == pygame.K_r and \
                event.mod & pygame.KMOD_CTRL:
                level.restart()
-            if event.key == pygame.K_m and not loadmenu.getDisplay() and \
+            if event.key == pygame.K_m and \
+               not loadmenu.getDisplay() and \
                not savemenu.getDisplay():
                level._showMiniMap = not level._showMiniMap
 
+         # If not loading or saving, handle the games events
          if not loadmenu.getDisplay() and not savemenu.getDisplay():
             level.handleEvent(event)
 
@@ -658,17 +663,17 @@ def main():
             sel = loadmenu.handleEvent(event)
             if sel != None:
                if loadmenu._tabs.getActive() == 1: 
-                  level.loadTemplate("templates\\" + sel + ".mapdat")
+                  level.loadTemplate("saves\\templates\\" + sel + ".mapdat")
                else:
-                  level.loadMap("maps\\" + sel + ".mapfile")
+                  level.loadMap("saves\\maps\\" + sel + ".mapfile")
 
          if savemenu.getDisplay():
             sel = savemenu.handleEvent(event)
             if sel != None:
                if savemenu._tabs.getActive() == 1: 
-                  level.saveTemplate("templates\\" + sel + ".mapdat")
+                  level.saveTemplate("saves\\templates\\" + sel + ".mapdat")
                else:
-                  level.saveMap("maps\\" + sel + ".mapfile")
+                  level.saveMap("saves\\maps\\" + sel + ".mapfile")
 
       #Calculate ticks
       ticks = gameClock.get_time() / 1000

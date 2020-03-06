@@ -1,19 +1,15 @@
-"""
-Author: Trevor Stalnaker
-File: loadmenu.py
-"""
-
 import pygame, glob
 from graphics import *
 from modules.drawable import Drawable
 
-class LoadMenu(Drawable, Window):
+class Menu(Drawable, Window):
 
-    def __init__(self, pos, dimensions):
-        """Initializes the pause menu"""
+    def __init__(self, pos, dimensions, menuType="Load"):
 
         Drawable.__init__(self, "", pos, worldBound=False)
         Window.__init__(self)
+
+        self._type = menuType
 
         self._offset = (pos[0], pos[1])
 
@@ -36,20 +32,22 @@ class LoadMenu(Drawable, Window):
                           self._font, (0,0,0), (120,120,120),
                           (self._width, 35), (0,0,0),
                           (255,255,255))
-        
-        self._loadButton = Button("Load", (buttonXpos,buttonYpos),
+
+        self._loadButton = Button(menuType, (buttonXpos,buttonYpos),
                                     self._font, (0,0,0), (0,255,0),
                                     buttonHeight, buttonWidth//2, (0,0,0), 2)
+
         self._cancelButton = Button("Cancel", (buttonXpos+buttonWidth//2, buttonYpos),
                                     self._font, (0,0,0), (120,120,150),
                                     buttonHeight, buttonWidth//2, (0,0,0), 2)
 
-        self._options = [{"text":x[5:][:-8],"func":self.updateSelection,"args":x[5:][:-8]} for x in glob.glob("maps/*")]
+        self._options = [{"text":x[11:][:-8],"func":self.updateSelection,"args":x[11:][:-8]} for x in glob.glob("maps/*")]
         self._levelSelect = ScrollSelector((pos[0]+3+buttonXpos,pos[1]+45),(buttonWidth,buttonHeight*2.75),
                                            30,self._options,(0,0,0))
 
         self._textbox = TextInput((buttonXpos,buttonYpos - (25 + 10)),
-                                  self._smallFont, (buttonWidth, 25))
+                                  self._smallFont, (buttonWidth, 25),
+                                  maxLen = 25)
         self._selection = None
 
         self.updateMenu()
@@ -64,6 +62,8 @@ class LoadMenu(Drawable, Window):
         self._loadButton.handleEvent(event, self.load, offset=self._offset)
         self._cancelButton.handleEvent(event, self.cancel, offset=self._offset)
         self._levelSelect.handleEvent(event)
+        if self._type == "Save":
+            self._textbox.handleEvent(event, offset=self._offset)
         
         active = self._tabs.getActive()
         self._tabs.handleEvent(event, offset=self._offset)
@@ -74,11 +74,11 @@ class LoadMenu(Drawable, Window):
 
     def updateOptions(self):
         if self._tabs.getActive() == 1:
-            self._options = [{"text":x[10:][:-7],"func":self.updateSelection,"args":x[10:][:-7]}
-                             for x in glob.glob("templates/*")]
+            self._options = [{"text":x[16:][:-7],"func":self.updateSelection,"args":x[16:][:-7]}
+                             for x in glob.glob("saves/templates/*")]
         else:
-            self._options = [{"text":x[5:][:-8],"func":self.updateSelection,"args":x[5:][:-8]}
-                             for x in glob.glob("maps/*")]
+            self._options = [{"text":x[11:][:-8],"func":self.updateSelection,"args":x[11:][:-8]}
+                             for x in glob.glob("saves/maps/*")]
         self._levelSelect.updateSelections(self._options)
         self._textbox.setText("")
 

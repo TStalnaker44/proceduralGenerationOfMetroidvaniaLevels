@@ -1,16 +1,7 @@
-"""
-Author: Trevor Stalnaker
-File: savemenu.py
-"""
 
-import pygame, glob
-from graphics import *
-from modules.drawable import Drawable
+class Menu():
 
-class SaveMenu(Drawable, Window):
-
-    def __init__(self, pos, dimensions):
-        """Initializes the pause menu"""
+    def __init__(self, pos, dimensions, menuType="Load"):
 
         Drawable.__init__(self, "", pos, worldBound=False)
         Window.__init__(self)
@@ -36,15 +27,16 @@ class SaveMenu(Drawable, Window):
                           self._font, (0,0,0), (120,120,120),
                           (self._width, 35), (0,0,0),
                           (255,255,255))
-        
-        self._loadButton = Button("Save", (buttonXpos,buttonYpos),
+
+        self._loadButton = Button(menuType, (buttonXpos,buttonYpos),
                                     self._font, (0,0,0), (0,255,0),
                                     buttonHeight, buttonWidth//2, (0,0,0), 2)
+
         self._cancelButton = Button("Cancel", (buttonXpos+buttonWidth//2, buttonYpos),
                                     self._font, (0,0,0), (120,120,150),
                                     buttonHeight, buttonWidth//2, (0,0,0), 2)
 
-        self._options = [{"text":x[5:][:-8],"func":self.updateSelection,"args":x[5:][:-8]} for x in glob.glob("maps/*")]
+        self._options = [{"text":x[11:][:-8],"func":self.updateSelection,"args":x[11:][:-8]} for x in glob.glob("maps/*")]
         self._levelSelect = ScrollSelector((pos[0]+3+buttonXpos,pos[1]+45),(buttonWidth,buttonHeight*2.75),
                                            30,self._options,(0,0,0))
 
@@ -55,12 +47,16 @@ class SaveMenu(Drawable, Window):
 
         self.updateMenu()
 
+    def display(self):
+        Window.display(self)
+        self.updateOptions()
+        self.updateMenu()
+
     def handleEvent(self, event):
         """Handles events on the pause menu"""
         self._loadButton.handleEvent(event, self.load, offset=self._offset)
         self._cancelButton.handleEvent(event, self.cancel, offset=self._offset)
         self._levelSelect.handleEvent(event)
-        self._textbox.handleEvent(event, offset=self._offset)
         
         active = self._tabs.getActive()
         self._tabs.handleEvent(event, offset=self._offset)
@@ -71,11 +67,11 @@ class SaveMenu(Drawable, Window):
 
     def updateOptions(self):
         if self._tabs.getActive() == 1:
-            self._options = [{"text":x[10:][:-7],"func":self.updateSelection,"args":x[10:][:-7]}
-                             for x in glob.glob("templates/*")]
+            self._options = [{"text":x[16:][:-7],"func":self.updateSelection,"args":x[16:][:-7]}
+                             for x in glob.glob("saves/templates/*")]
         else:
-            self._options = [{"text":x[5:][:-8],"func":self.updateSelection,"args":x[5:][:-8]}
-                             for x in glob.glob("maps/*")]
+            self._options = [{"text":x[11:][:-8],"func":self.updateSelection,"args":x[11:][:-8]}
+                             for x in glob.glob("saves/maps/*")]
         self._levelSelect.updateSelections(self._options)
         self._textbox.setText("")
 
@@ -103,11 +99,6 @@ class SaveMenu(Drawable, Window):
     def draw(self, screen):
         Drawable.draw(self, screen)
         self._levelSelect.draw(screen)
-
-    def display(self):
-        Window.display(self)
-        self.updateOptions()
-        self.updateMenu()
 
     def updateMenu(self):
         """Updates the display of the pause menu"""

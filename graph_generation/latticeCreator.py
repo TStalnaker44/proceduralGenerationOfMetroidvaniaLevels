@@ -1,5 +1,6 @@
 
-import random, grapher
+import random
+import graph_generation.grapher as grapher
 import networkx as nx
 import matplotlib.pyplot as plt
 
