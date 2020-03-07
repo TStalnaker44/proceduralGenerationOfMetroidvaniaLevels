@@ -51,7 +51,6 @@ class LevelTester():
 
       # Create a standard unit for creation of map
       self._u = Avatar((0,0)).getHeight()*1.5
-      print(self._u)
 
       # Dimensions of the rooms in the world
       self._roomHeight = roomDims[1] * self._u #standard units

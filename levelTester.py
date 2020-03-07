@@ -29,7 +29,9 @@ class LevelTester():
       self._font = pygame.font.SysFont("Times New Roman", 32)
       self._colors = {"grey":(80,80,80),"red":(255,0,0), "green":(0,255,0), "blue":(0,0,255),
              "orange":(255,165,0),"white":(255,255,255),"brown":(160,82,45),
-             "purple":(128,0,128), "pink":(255,192,203),"yellow":(255,255,0)}
+             "purple":(128,0,128), "pink":(255,192,203),"yellow":(255,255,0),
+             "double_jump":(255,97,50),"shrink":(120,120,45),
+             "neutral":(10,10,10)}
       self._SCREEN_SIZE = screen_size
       self._won      =  False
       self._player   =  None
@@ -172,11 +174,11 @@ class LevelTester():
             self.plot()
          elif event.key == pygame.K_s:
             sfile = input("Name the file to be saved: ")
-            self.saveMap("maps\\" + sfile + ".mapdat")
+            self.saveMap("saves\\templates\\" + sfile + ".mapdat")
          elif event.key == pygame.K_l:
-            print("Files:", [x[5:][:-7] for x in glob.glob("maps/*")])
+            print("Files:", [x[5:][:-7] for x in glob.glob("saves/templates/*")])
             lfile = input("File to load: ")
-            self.loadMap("maps\\" + lfile + ".mapdat")
+            self.loadMap("saves\\templates\\" + lfile + ".mapdat")
          elif event.key == pygame.K_n:
             self.newMap()
 
@@ -204,8 +206,11 @@ class LevelTester():
       color_map = []
       for node in self._g:
           for gate in self._gates:
-              if self._keys[gate] == node:
-                  color_map.append(gate)
+              if self._keys[gate] == node and gate in self._colors.keys():
+                  if gate in ["double_jump","shrink","neutral"]:
+                     color_map.append("grey")
+                  else:
+                     color_map.append(gate)
                   break
           else:
               color_map.append("grey")
