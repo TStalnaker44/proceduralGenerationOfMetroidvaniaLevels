@@ -1,6 +1,6 @@
 """
 Author: Trevor Stalnaker
-File: levelTester
+File: levelDemo
 Description:
     Provides a visual, interactive way to experiment with generated
     metroidvannia style mappings

@@ -1,6 +1,6 @@
 """
 Author: Trevor Stalnaker
-File: maze_game.py
+File: gameDemo.py
 """
 
 import pygame, pickle, glob, random

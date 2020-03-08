@@ -21,7 +21,7 @@ class Avatar(Drawable):
         self._image.set_colorkey(self._image.get_at((0,0)))
 
         self._velocity = Vector2(0,0)
-        self._maxVelocity = 100
+        self._maxVelocity = 150
         self._movement = {pygame.K_LEFT:False,
                           pygame.K_RIGHT:False,
                           pygame.K_UP:False,
@@ -66,8 +66,7 @@ class Avatar(Drawable):
         
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             if (self._fsm.getCurrentState() == "standing" or \
-               self._fsm.getCurrentState() == "walking") and \
-               self._onGround:
+               self._fsm.getCurrentState() == "walking"):
                 self._fsm.changeState("jump")
                 self._onGround = False
                 self._jumpCount += 1
@@ -106,8 +105,6 @@ class Avatar(Drawable):
         else:
             self._velocity.x = 0
 
-        #print(self._fsm.getCurrentState())
-
         if (self._fsm.getCurrentState() == "standing" or \
            self._fsm.getCurrentState() == "walking") and \
            not self._onGround:
@@ -138,6 +135,9 @@ class Avatar(Drawable):
            self._velocity[1] = 0
 
         self._position += (self._velocity * ticks)
+
+        # Reset on ground to false (the default)
+        self._onGround = False
         
         for other in platforms + walls:
 
