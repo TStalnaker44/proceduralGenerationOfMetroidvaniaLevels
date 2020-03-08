@@ -165,8 +165,6 @@ class LevelTester():
          for edge in self._g.edges(data=True):
             if edge[0] == self._player.getCurrentSquare()+1:
                connections[edge[1]] = edge[2]["object"]
-            elif edge[1] == self._player.getCurrentSquare()+1:
-               connections[edge[0]] = edge[2]["object"]
          self._player.handleEvent(event, connections)
 
       if event.type == pygame.KEYDOWN:   
