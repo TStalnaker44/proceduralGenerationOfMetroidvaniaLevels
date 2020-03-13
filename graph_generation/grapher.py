@@ -25,7 +25,7 @@ def getGateOrder(ordering):
     """Function that creates a viable ordering for the
     provided keys given their ordering criteria"""
     
-    # Improve this with a better solution
+    # Create a graph (tree) of the gating techniques
     g = createGraph(ordering)
 
     # Find the start node

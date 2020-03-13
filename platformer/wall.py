@@ -55,7 +55,7 @@ class Wall(Barrier):
                            self._position[1]+topHeight+gateHeight)
 
             # Create the top wall component
-            if connectionType != "neutral" or random.random() > .5:
+            if random.random() > .5:
                 self._components.append(Gate(self._position,
                                              self._neutral,
                                              99,
@@ -241,7 +241,7 @@ class Platform(Barrier):
                 direction=1,
                 size=(size[0],leftEdgeLength)))
 
-            # Create the upper gate component
+            # Create the left edge component
             if not connectionType[0] in ["neutral"]: 
                 # Create the gated opening
                 self._components.append(Gate(
@@ -252,7 +252,7 @@ class Platform(Barrier):
                     size=(size[0]//2,gateWidth),
                     passThrough=(True,False,False,False)))
 
-            # Create the lower gate component
+            # Create the gate component if needed
             if not connectionType[1] in ["neutral","double_jump"]: 
                 # Create the gated opening
                 self._components.append(Gate(

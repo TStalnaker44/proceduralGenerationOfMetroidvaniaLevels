@@ -216,7 +216,7 @@ def viableMap(dimensions, gates, keys, mappings, weightedNeutral=0, endNode=None
 
     # Determine if a primary edge connects the first node to another
     for e in primary_edges:
-        if e[0] == 1:
+        if e[0] == startNode:
             return g
             
     return False

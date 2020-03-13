@@ -14,9 +14,11 @@ class Gate(Drawable):
         #Pass Through (Up, Down, Left, Right)
         super().__init__("", position)
         self._direction = direction #The directionality of the gate
+        # A vertical gate (appearing on a wall)
         if direction==0:
             self._width = size[0]
             self._height = size[1]
+        # A horizontal gate (appearing on a platform)
         elif direction==1:
             self._width = size[1]
             self._height = size[0]

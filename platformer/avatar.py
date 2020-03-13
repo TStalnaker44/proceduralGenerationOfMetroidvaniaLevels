@@ -92,7 +92,7 @@ class Avatar(Drawable):
             self._movement[event.key] = False
 
     def update(self, worldInfo, ticks, platforms, walls):
-        """Updates the position of the star"""
+        """Updates the position of the player"""
         
         if self._movement[pygame.K_LEFT]:
             self._velocity.x = -self._maxVelocity
@@ -125,7 +125,7 @@ class Avatar(Drawable):
             else:
                 self._fsm.changeState("stop")
 
-        #Update the position of the star based on its current velocity and ticks
+        #Update the position of the player based on its current velocity and ticks
         newPosition = self._position + (self._velocity * ticks)
         if newPosition[0] < 0 or \
            (newPosition[0] + self.getWidth()) > worldInfo[0]:
