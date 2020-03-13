@@ -498,7 +498,7 @@ class LevelTester():
    def update(self, worldsize, ticks):
       """Update the level state and display"""
 
-      # Update the offset based on the stars location
+      # Update the offset based on the player's location
       self._player.updateOffset(self._player, self._SCREEN_SIZE, self._WORLD_SIZE)
 
       # Update the player object (prevents player from phasing through walls)
