@@ -17,8 +17,8 @@ import graph_generation.latticeCreator as latticeCreator
 from graphics import MySurface
 from platformer.menu import Menu
 
-n = 6#random.randint(4,10)#6
-m = 6#random.randint(4,10)#4
+n = 8#random.randint(4,10)#6
+m = 8#random.randint(4,10)#4
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (1000,625)
@@ -570,10 +570,11 @@ def main():
    h_mapping = ["neutral","shrink","blue","white","grey","double_jump"]
    v_mapping = ["neutral",("double_jump","neutral"),"blue","white","grey",
                 ("orange","blue")]
+
    
    endNode   = n*m
    startNode = 1
-   assert n*m > 3*len(ordering) # A reasonable assumption that will hopefully prevent an infinite loop
+   #assert n*m > 3*len(ordering) # A reasonable assumption that will hopefully prevent an infinite loop
    assert 0 < endNode <= n*m
    assert 0 < startNode <= n*m
    assert startNode != endNode

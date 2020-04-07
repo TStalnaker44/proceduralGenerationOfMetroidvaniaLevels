@@ -241,7 +241,7 @@ class Platform(Barrier):
                 direction=1,
                 size=(size[0],leftEdgeLength)))
 
-            # Create the left edge component
+            # Create the upper component
             if not connectionType[0] in ["neutral"]: 
                 # Create the gated opening
                 self._components.append(Gate(

@@ -25,7 +25,7 @@ class Room():
 class Connector():
 
     def __init__(self):
-        self._image = pygame.Surface((1000,1000))
+        self._image = pygame.Surface((5000,5000))
         self._image.fill((0,0,0))
         self._image.set_colorkey((0,0,0))
 

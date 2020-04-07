@@ -17,8 +17,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from graphics import *
 
-m = 6#random.randint(5,8) # number of rows
-n = 6#random.randint(5,8) # number of columns
+m = 4#random.randint(5,8) # number of rows
+n = 12#random.randint(5,8) # number of columns
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (n*100,m*100)
@@ -50,6 +50,7 @@ class LevelTester():
       self._endNode = endNode
       self._startNode = startNode
       self._ordering = ordering
+      self._weightedNeutral = .5
       # Create a graph model
       dimensions = (m,n)
       self._gates = grapher.getGateOrder(ordering)
@@ -84,7 +85,8 @@ class LevelTester():
    def saveMap(self, fileName):
       """Save a map to file"""
       md = MapData(self._g, self._keys, self._gates, self._m, self._n, self._endNode,
-                   self._ordering, self._startNode)
+                   self._ordering, self._startNode, self._weightedNeutral,
+                   self._h_mapping, self._v_mapping)
       with open(fileName, "wb") as pFile:
          pickle.dump(md, pFile, protocol=pickle.HIGHEST_PROTOCOL)
 
