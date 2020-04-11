@@ -30,16 +30,17 @@ def getGateOrder(ordering):
 
     # Find the start node
     start = [node for node, degree in g.in_degree() if degree==0][0]
-    order, used = [start], [start]
+    order = [start]
     possibleNext = []
     
     while len(order) < g.number_of_nodes():
         for node in order:
             for x in g.neighbors(node):
-                possibleNext.append(x)
+                if not x in order:
+                    possibleNext.append(x)
         posNex = random.choice(possibleNext)
-        if not posNex in order:
-            order.append(posNex)
+##        if not posNex in order:
+        order.append(posNex)
         
     return order
 
