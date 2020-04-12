@@ -124,7 +124,8 @@ def createGraph(dimensions, gates, mappings, weightedNeutral=0, endNode=None):
 
             detConnection(g, i, i-n, nodes, nodeStack, completedNodes, gates, endNode, mappings[1],  weightedNeutral)
             detConnection(g, i, i-1, nodes, nodeStack, completedNodes, gates, endNode, mappings[0],  weightedNeutral)
-            
+
+        completedNodes.append(i) 
     return g
 
 def findExplorable(g, keys, startNode=1):
