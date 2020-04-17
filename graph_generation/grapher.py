@@ -39,8 +39,8 @@ def getGateOrder(ordering):
                 if not x in order:
                     possibleNext.append(x)
         posNex = random.choice(possibleNext)
-##        if not posNex in order:
         order.append(posNex)
+        possibleNext = [] # Clear the possible next list
         
     return order
 

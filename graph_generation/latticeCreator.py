@@ -22,11 +22,12 @@ def detConnection(g, i, node, nodes, nodeStack, completedNodes, gates,
             if random.random() < weightedNeutral:
                 gateTech = gates[0]
             else:
-                while not gateTech in availableGates:
-                    gateTech = gates[random.randint(1,len(gates)-1)]   
+                while True:
+                    gateTech = random.choice(availableGates) 
+                    if gateTech != gates[0]:
+                        break
         else:
-            while not gateTech in availableGates:
-                gateTech = gates[random.randint(0,len(gates)-1)]
+             gateTech = random.choice(availableGates)
 
         if i == endNode or node == endNode:
             gateTech = gates[-1]
