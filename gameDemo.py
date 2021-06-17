@@ -17,8 +17,8 @@ import graph_generation.latticeCreator as latticeCreator
 from graphics import MySurface
 from platformer.menu import Menu
 
-n = 8#random.randint(4,10)#6
-m = 8#random.randint(4,10)#4
+n = 6#random.randint(4,10)#6
+m = 6#random.randint(4,10)#4
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (1000,625)
@@ -76,6 +76,7 @@ class LevelTester():
       self._v_mapping = grapher.getDirectionalMapping(v_mapping)
       self._mappings = (self._h_mapping, self._v_mapping)
       self._gates = grapher.getGateOrder(ordering)
+      print(self._gates)
       self._keys = {gate:startNode for gate in self._gates} #This provides default start for keys
       self._weightedNeutral = weightedNeutral
       # Create a graph model
@@ -563,16 +564,28 @@ def main():
    roomDimensions = (18,6) # in units u
 
    level = LevelTester(SCREEN_SIZE, WORLD_SIZE, roomDimensions)
-   
+
    ordering = {"neutral":["shrink","orange"],"shrink":"double_jump",
                "orange":"grey","double_jump":"blue","blue":"white",}
 
    h_mapping = ["neutral","shrink","blue","white","grey","double_jump"]
    v_mapping = ["neutral",("double_jump","neutral"),"blue","white","grey",
                 ("orange","blue")]
+   
+##   ordering = {"neutral":["shrink","orange"],"shrink":["double_jump","red"],
+##               "orange":"grey","double_jump":"blue","blue":"white",}
+##
+##   h_mapping = ["neutral","shrink","blue","white","grey","double_jump","red"]
+##   v_mapping = ["neutral",("double_jump","neutral"),"blue","white","grey",
+##                ("orange","blue"),"red"]
+##
+##   ordering = {"neutral":"red","red":"green"}
+##
+##   h_mapping = ["neutral","red","green"]
+##   v_mapping = ["neutral","red","green"]
 
    
-   endNode   = n*m
+   endNode   = m*n
    startNode = 1
    #assert n*m > 3*len(ordering) # A reasonable assumption that will hopefully prevent an infinite loop
    assert 0 < endNode <= n*m

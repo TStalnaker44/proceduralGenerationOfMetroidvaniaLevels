@@ -17,8 +17,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from graphics import *
 
-m = 4#random.randint(5,8) # number of rows
-n = 12#random.randint(5,8) # number of columns
+m = 3#random.randint(5,8) # number of rows
+n = 4#random.randint(5,8) # number of columns
 
 # Dynamically determine screen size based on grid size
 SCREEN_SIZE = (n*100,m*100)
@@ -247,11 +247,21 @@ def main():
 ##   h_mapping = ["red",("blue", "green"),"blue","white","grey"]
 ##   v_mapping = ["red",("green","blue"),"orange","white","grey"]
 
-   ordering = {"pink":["red","orange"],"red":"green",
-               "orange":"grey","green":"blue","blue":"white",}
-   h_mapping = ["pink",("red","blue"),"green","blue","white","grey"]
-   v_mapping = ["pink","red",("green","pink"),"blue","white","grey",
-                ("orange","blue")]
+##   ordering = {"pink":["red","orange"],"red":"green",
+##               "orange":"grey","green":"blue","blue":"white",}
+##   h_mapping = ["pink",("red","blue"),"green","blue","white","grey"]
+##   v_mapping = ["pink","red",("green","pink"),"blue","white","grey",
+##                ("orange","blue")]
+
+##   ordering = {"neutral":["red","blue"],"red":["green","orange"],"blue":"white"}
+##
+##   h_mapping = ["neutral","red","blue","green",("orange","blue"),"white"]
+##   v_mapping = ["neutral","red","green",("orange","blue"),"white"]
+
+   ordering = {"neutral":"red","red":"green"}
+
+   h_mapping = ["neutral","red","green"]
+   v_mapping = ["neutral","red","green"]
    
    endNode   = n*m
    startNode = 1
