@@ -281,10 +281,10 @@ class Platform(Barrier):
                 step = 1
                 start = 1
             for x in range(start, numOfPlatforms, step):
-                length = random.randint(midplatformLength-(size[1]//8),
-                                        midplatformLength+(size[1]//8))
+                length = random.randint(int(midplatformLength-(size[1]//8)),
+                                        int(midplatformLength+(size[1]//8)))
                 midplatformXPos = self._position[0] + ((size[1] // 2) - (length // 2)) + \
-                                  random.randint(-standardUnit,standardUnit)
+                                  random.randint(int(-standardUnit),int(standardUnit))
                 self._components.append(Gate(
                     ((midplatformXPos, self._position[1]+(x*standardUnit))),
                     self._neutral,
